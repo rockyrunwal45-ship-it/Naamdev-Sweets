@@ -6,7 +6,7 @@
     <title>Naamdev Ice Cream Corner & Sweets</title>
     <!-- Tailwind CSS v4 -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Leaflet.js Maps -->
+    <!-- Leaflet.js Maps CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,18 +14,18 @@
     <style>
         .active-tab { display: block; }
         .inactive-tab { display: none; }
-        #map { height: 320px; width: 100%; border-radius: 16px; z-index: 1; }
+        #map { height: 360px; width: 100%; border-radius: 24px; z-index: 1; }
     </style>
 </head>
 <body class="bg-slate-50 font-sans pb-24">
 
     <!-- App Header -->
-    <header class="bg-white shadow-sm sticky top-0 z-50 px-4 py-3 flex justify-between items-center border-b border-gray-100">
+    <header class="bg-white shadow-xs sticky top-0 z-50 px-4 py-3 flex justify-between items-center border-b border-gray-100">
         <div>
             <h1 class="text-xl font-black text-red-500 tracking-tight flex items-center gap-1">
                 🍦 Naamdev Ice Cream Corner
             </h1>
-            <p class="text-xs text-gray-500 font-medium"><i class="fa-solid fa-location-dot text-red-500"></i> लादरिया (Main Market)</p>
+            <p class="text-xs text-gray-500 font-medium"><i class="fa-solid fa-location-dot text-red-500"></i> लादरिया (मुख्य बाज़ार)</p>
         </div>
         <div class="relative bg-red-50 p-2.5 rounded-full cursor-pointer" onclick="switchTab('store')">
             <i class="fa-solid fa-bag-shopping text-xl text-red-500"></i>
@@ -33,38 +33,39 @@
         </div>
     </header>
 
-    <!-- ================= 1. STORE / CUSTOMER VIEW ================= -->
+    <!-- ================= 1. STORE FRONT VIEW ================= -->
     <div id="tab-store" class="active-tab p-4 max-w-md mx-auto space-y-4">
-        <!-- Premium Zomato Banner -->
-        <div class="bg-gradient-to-br from-red-500 via-red-600 to-pink-600 rounded-3xl p-5 text-white shadow-lg relative overflow-hidden">
-            <div class="relative z-10">
-                <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Premium Quality</span>
-                <h2 class="text-xl font-black mt-2">मटर पनीर, बटरस्कॉट क्रीम केक व आइसक्रीम</h2>
-                <p class="text-xs opacity-90 mt-1">शादी व पार्टियों के लिए स्पेशल कैटरिंग ऑर्डर बुक किए जाते हैं।</p>
+        
+        <!-- Super Fast 5KM Delivery Banner -->
+        <div class="bg-gradient-to-br from-red-500 via-pink-600 to-red-600 rounded-3xl p-5 text-white shadow-md relative overflow-hidden">
+            <div class="relative z-10 space-y-1">
+                <span class="bg-yellow-400 text-slate-900 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow-xs">🚀 5KM FAST DELIVERY</span>
+                <h2 class="text-xl font-black pt-1">मटर पनीर, बटरस्कॉट केक व आइसक्रीम</h2>
+                <p class="text-xs opacity-90">हमारे 5 किलोमीटर के दायरे में सुपर फ़ास्ट डिलीवरी की सुविधा उपलब्ध है। शादी-पार्टी ऑर्डर चालू हैं!</p>
             </div>
-            <div class="absolute -right-6 -bottom-6 opacity-15 text-9xl font-bold">🍕</div>
+            <div class="absolute -right-4 -bottom-6 opacity-15 text-8xl font-bold">🛵</div>
         </div>
 
-        <!-- Product Menu List -->
-        <h3 class="text-gray-800 font-extrabold text-base tracking-tight flex items-center gap-2 mt-2">
-            <span class="w-1 h-5 bg-red-500 rounded-full"></span> आज का फ्रेश मेनू
+        <!-- Dynamic Product Menu Grid -->
+        <h3 class="text-gray-800 font-extrabold text-base tracking-tight flex items-center gap-2 pt-2">
+            <span class="w-1 h-5 bg-red-500 rounded-full"></span> लाइव फ्रेश मेनू
         </h3>
         <div id="product-list" class="grid grid-cols-1 gap-3.5">
-            <div class="text-center py-12 text-gray-400 text-sm">मेनू लोड हो रहा है...</div>
+            <div class="text-center py-12 text-gray-400 text-sm">शॉप का मेनू लोड हो रहा है...</div>
         </div>
     </div>
 
-    <!-- ================= 2. ADMIN LOGIN & PANEL ================= -->
+    <!-- ================= 2. ADVANCED RAKESH ADMIN PANEL ================= -->
     <div id="tab-admin" class="inactive-tab p-4 max-w-md mx-auto space-y-4">
         
-        <!-- SECURE LOGIN SCREEN -->
+        <!-- SECURE SECURITY LOGIN SCREEN -->
         <div id="admin-login-screen" class="bg-white rounded-3xl p-6 shadow-xl border border-gray-100 text-center space-y-4">
-            <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto text-2xl text-red-500 shadow-inner">
-                <i class="fa-solid fa-lock"></i>
+            <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto text-2xl text-red-500">
+                <i class="fa-solid fa-shield-halved"></i>
             </div>
             <div>
-                <h2 class="text-xl font-black text-gray-800">राकेश भाई लॉगिन करें</h2>
-                <p class="text-xs text-gray-400 mt-0.5">सिस्टम को मैनेज करने के लिए क्रेडेंशियल्स डालें</p>
+                <h2 class="text-xl font-black text-gray-800">राकेश भाई लॉगिन पैनल</h2>
+                <p class="text-xs text-gray-400 mt-0.5">शॉप मैनेजमेंट कंट्रोलर</p>
             </div>
             <div class="space-y-3 text-left">
                 <div>
@@ -75,28 +76,26 @@
                     <label class="block text-xs font-bold text-gray-500 mb-1">पासवर्ड Pin</label>
                     <input type="password" id="admin-pass" placeholder="••••••" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-red-500 font-medium tracking-widest">
                 </div>
-                <button onclick="verifyAdminLogin()" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-3 rounded-xl text-sm transition shadow-md">
-                    पैनल अनलॉक करें <i class="fa-solid fa-unlock-keyhole ml-1"></i>
+                <button onclick="verifyAdminLogin()" class="w-full bg-slate-900 hover:bg-black text-white font-bold py-3 rounded-xl text-sm transition shadow-md">
+                    मैनेजमेंट डैशबोर्ड खोलें <i class="fa-solid fa-unlock ml-1"></i>
                 </button>
             </div>
         </div>
 
-        <!-- REAL ADMIN INTERFACE -->
-        <div id="admin-dashboard" class="hidden space-y-4">
-            <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 relative">
+        <!-- MASTER ADMINISTRATION INTERFACE -->
+        <div id="admin-dashboard" class="hidden space-y-5">
+            <div class="bg-white rounded-3xl p-5 shadow-xs border border-gray-100">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-black text-gray-800 flex items-center gap-2">
-                        <i class="fa-solid fa-circle-check text-green-500"></i> कंट्रोल पैनल (Rakesh)
+                    <h2 class="text-base font-black text-slate-800 flex items-center gap-1.5">
+                        <span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span> राकेश भाई (मुख्य एडमिन)
                     </h2>
-                    <button onclick="logoutAdmin()" class="text-xs font-bold text-red-500 bg-red-50 px-2.5 py-1 rounded-lg">लॉगआउट</button>
+                    <button onclick="logoutAdmin()" class="text-xs font-bold text-red-500 bg-red-50 px-3 py-1 rounded-xl">लॉगआउट</button>
                 </div>
                 
-                <!-- Add Product Form Expansion -->
-                <div class="space-y-3 bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                    <h3 class="font-extrabold text-xs text-gray-500 uppercase tracking-wider">नया आइटम / स्टॉक जोड़ें</h3>
-                    <div>
-                        <input type="text" id="p-name" placeholder="नाम (जैसे: Butterscotch Cake)" class="w-full p-2.5 bg-white border rounded-xl text-sm focus:outline-red-500 font-medium">
-                    </div>
+                <!-- Stock Addition Form Module -->
+                <div class="space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <h3 class="font-extrabold text-xs text-gray-500 uppercase tracking-wider">नया आइटम स्टॉक जोड़ें</h3>
+                    <input type="text" id="p-name" placeholder="नाम (जैसे: Butterscotch Cake)" class="w-full p-2.5 bg-white border rounded-xl text-sm focus:outline-red-500 font-medium">
                     <div class="grid grid-cols-2 gap-2">
                         <input type="number" id="p-price" placeholder="कीमत (₹)" class="w-full p-2.5 bg-white border rounded-xl text-sm focus:outline-red-500 font-medium">
                         <select id="p-category" class="w-full p-2.5 bg-white border rounded-xl text-sm focus:outline-red-500 font-medium">
@@ -105,110 +104,137 @@
                             <option value="Snacks">Hot Snacks</option>
                         </select>
                     </div>
-                    <div>
-                        <input type="text" id="p-image" placeholder="फोटो लिंक (URL)" class="w-full p-2.5 bg-white border rounded-xl text-sm focus:outline-red-500 text-xs">
-                    </div>
-                    <button onclick="addProduct()" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-xs">
-                        <i class="fa-solid fa-square-plus mr-1"></i> शॉप मेनू में लाइव सेव करें
+                    <input type="text" id="p-image" placeholder="फोटो वेब URL लिंक" class="w-full p-2.5 bg-white border rounded-xl text-xs">
+                    <button onclick="addProduct()" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 rounded-xl text-xs transition">
+                        <i class="fa-solid fa-square-plus mr-1"></i> लाइव मेनू में सेव करें
                     </button>
                 </div>
             </div>
 
-            <!-- Active Orders Dashboard Section -->
-            <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
-                <h3 class="font-black text-gray-800 mb-3 flex items-center gap-1.5">
-                    🛍️ प्राप्त लाइव ऑर्डर्स 
+            <!-- LIVE ORDERS MANAGEMENT HUB -->
+            <div class="bg-white rounded-3xl p-5 shadow-xs border border-gray-100 space-y-3">
+                <h3 class="font-black text-gray-800 text-sm flex items-center gap-2">
+                    📦 प्राप्त ग्राहक ऑर्डर्स (मैनेजमेंट काउंटर)
                 </h3>
                 <div id="admin-orders-list" class="space-y-3">
-                    <p class="text-xs text-gray-400 py-4 text-center">कोई एक्टिव ऑर्डर पेंडिंग नहीं है।</p>
+                    <p class="text-xs text-gray-400 py-4 text-center">कोई एक्टिव आर्डर पेंडिंग नहीं है।</p>
                 </div>
             </div>
         </div>
     </div>
-        <!-- ================= 3. TRACK ORDER VIEW ================= -->
+        <!-- ================= 3. TRACK LIVE ORDER & ROUTE VIEW ================= -->
     <div id="tab-track" class="inactive-tab p-4 max-w-md mx-auto space-y-4">
-        <!-- No Active Order State UI -->
-        <div id="no-order-tracking" class="bg-white rounded-3xl p-8 text-center border shadow-xs space-y-3">
+        
+        <!-- Empty State UI -->
+        <div id="no-order-tracking" class="bg-white rounded-3xl p-8 text-center border shadow-2xs space-y-3">
             <div class="text-4xl">🛵</div>
             <h3 class="font-bold text-gray-800">कोई एक्टिव डिलीवरी रनिंग नहीं है</h3>
-            <p class="text-xs text-gray-400 max-w-xs mx-auto">जब आप स्टोर से कोई सामान ऑर्डर करेंगे, तब यहाँ रियल-टाइम लाइव मैप और दूरी की गणना चालू होगी।</p>
+            <p class="text-xs text-gray-400 max-w-xs mx-auto">जब स्टोर से नया ऑर्डर बुक होगा, तो यहाँ लादरिया दुकान से घर तक की लाइव रोड लाइन दिखने लगेगी।</p>
             <button onclick="switchTab('store')" class="bg-red-500 text-white text-xs font-bold px-4 py-2 rounded-xl">अभी ऑर्डर करें</button>
         </div>
 
-        <!-- Active Tracking System -->
+        <!-- Active Tracking Engine Screen Map UI -->
         <div id="active-tracking-box" class="hidden space-y-4">
-            <!-- Delivery Status Card -->
-            <div class="bg-white rounded-3xl p-4 shadow-sm border border-gray-100 flex items-center justify-between">
+            
+            <!-- Order Delivery Status Card Header -->
+            <div class="bg-white rounded-3xl p-4 shadow-xs border border-gray-100 flex items-center justify-between">
                 <div>
-                    <span class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">Order Dispatched</span>
-                    <h2 id="delivery-eta" class="text-xl font-black text-gray-800 mt-1">कैलकुलेटिंग डिस्टेंस...</h2>
+                    <span id="order-status-badge" class="text-[10px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full animate-pulse">Processing Order</span>
+                    <h2 id="delivery-eta" class="text-lg font-black text-gray-800 mt-1">रोड रूट मैप तैयार है...</h2>
                     <p class="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
-                        <i class="fa-solid fa-road text-gray-400"></i> आपकी दुकान से दूरी: <span id="delivery-distance" class="font-bold text-gray-700">0.0 km</span>
+                        <i class="fa-solid fa-road text-red-500"></i> आपकी दुकान से दूरी: <span id="delivery-distance" class="font-bold text-red-500">0.0 km</span>
                     </p>
                 </div>
                 <div class="text-right">
                     <p class="text-xs font-black text-gray-700">ID: <span id="active-tracking-id">--</span></p>
-                    <span class="inline-block w-2.5 h-2.5 bg-green-500 rounded-full animate-ping mt-1"></span>
+                    <span class="inline-block w-2.5 h-2.5 bg-red-500 rounded-full animate-ping mt-1"></span>
                 </div>
             </div>
             
-            <!-- Map Container -->
+            <!-- Map Routing Container -->
             <div class="relative rounded-3xl overflow-hidden shadow-md border border-gray-100 bg-gray-100">
                 <div id="map"></div>
             </div>
 
-            <!-- Delivery Rider GPS Controller Box -->
+            <!-- Delivery Rider Simulation GPS Core Controller -->
             <div class="bg-slate-900 text-white rounded-3xl p-4 shadow-lg space-y-2">
                 <div class="flex justify-between items-center">
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">डिलीवरी बॉय फ़ोन CONTROL:</h4>
-                    <span id="gps-indicator" class="text-[10px] font-bold text-red-400 bg-red-950 px-2 py-0.5 rounded">GPS Offline</span>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">लादरिया डिलीवरी बॉय GPS ट्रैकर:</h4>
+                    <span id="gps-indicator" class="text-[10px] font-bold text-red-400 bg-red-950 px-2 py-0.5 rounded">GPS Setup Ready</span>
                 </div>
-                <p class="text-[11px] text-slate-300">नीचे बटन दबाकर डिलीवरी बॉय अपने मोबाइल की **Current Location** से लाइव ट्रैकिंग सेंड करना शुरू कर सकता है।</p>
-                <button onclick="startRiderLiveGPS()" class="w-full bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-1.5">
-                    <i class="fa-solid fa-location-crosshairs"></i> शेयर माई लाइव लोकेशन (Start GPS)
+                <p class="text-[11px] text-slate-300">नीचे दिया बटन दबाते ही डिलीवरी बॉय दुकान से कस्टमर की तरफ नीली लाइन पर आगे बढ़ेगा।</p>
+                <button onclick="startRiderLiveGPS()" class="w-full bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-location-crosshairs"></i> डिलीवरी राइडर लाइव मूवमेंट शुरू करें
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Customer Cart Overlay Footer -->
-    <div id="cart-bar" class="fixed bottom-16 left-0 right-0 bg-white shadow-xl border-t border-gray-100 p-4 hidden max-w-md mx-auto z-40 rounded-t-2xl">
-        <div class="space-y-3">
+    <!-- CUSTOMER CART & AUTO-ZIP DETAILS SLIDE OVERLAY -->
+    <div id="cart-bar" class="fixed bottom-16 left-0 right-0 bg-white shadow-2xl border-t border-gray-100 p-4 hidden max-w-md mx-auto z-40 rounded-t-3xl space-y-3">
+        <h3 class="font-extrabold text-xs text-gray-700 border-b pb-2"><i class="fa-solid fa-truck-ramp-box text-red-500"></i> डिलीवरी हेतु अपनी जानकारी भरें</h3>
+        
+        <div class="grid grid-cols-2 gap-2">
             <div>
-                <label class="block text-[11px] font-bold text-gray-500 mb-1">अपना डिलीवरी एड्रेस डालें (दूरी मापने के लिए):</label>
-                <input type="text" id="customer-address" value="Ladriya Main Chowk" placeholder="मकान नंबर, गली या मुख्य लैंडमार्क" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-red-500 font-medium">
+                <label class="block text-[10px] font-bold text-gray-500 mb-0.5">ग्राहक का नाम</label>
+                <input type="text" id="c-name" placeholder="नाम लिखें" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:outline-red-500 font-medium">
             </div>
-            <div class="flex justify-between items-center pt-1">
-                <div>
-                    <p id="cart-summary" class="text-base font-black text-gray-800">0 Item | ₹0</p>
-                    <p class="text-[10px] text-gray-400 font-medium">Naamdev Ice Cream से तुरंत रवानगी</p>
-                </div>
-                <button onclick="placeOrder()" class="bg-red-500 text-white font-bold px-5 py-2.5 rounded-xl text-xs hover:bg-red-600 shadow-sm transition">
-                    ऑर्डर फाइनल करें <i class="fa-solid fa-arrow-right ml-1"></i>
-                </button>
+            <div>
+                <label class="block text-[10px] font-bold text-gray-500 mb-0.5">मोबाइल नंबर</label>
+                <input type="tel" id="c-phone" placeholder="98765xxxxx" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:outline-red-500 font-medium">
             </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2">
+            <div>
+                <label class="block text-[10px] font-bold text-gray-500 mb-0.5">पिनकोड (Pin)</label>
+                <input type="number" id="c-pincode" oninput="autoDetectLocationByPin()" placeholder="341303" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:outline-red-500 font-black text-red-500">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-gray-500 mb-0.5">सिटी (City)</label>
+                <input type="text" id="c-city" placeholder="सिटी नाम" class="w-full p-2 bg-gray-100 border border-gray-200 rounded-xl text-xs text-gray-600 font-bold" readonly>
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-gray-500 mb-0.5">रीजन (Region)</label>
+                <input type="text" id="c-region" placeholder="रीजन नाम" class="w-full p-2 bg-gray-100 border border-gray-200 rounded-xl text-xs text-gray-600 font-bold" readonly>
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-[10px] font-bold text-gray-500 mb-0.5">विस्तृत मकान / गली का पता</label>
+            <input type="text" id="c-street" placeholder="जैसे: मुख्य चौक, सदर बाज़ार के पास" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:outline-red-500 font-medium">
+        </div>
+
+        <div class="flex justify-between items-center pt-2 border-t border-gray-50">
+            <div>
+                <p id="cart-summary" class="text-base font-black text-gray-800">0 Item | ₹0</p>
+                <p class="text-[9px] text-emerald-600 font-bold"><i class="fa-solid fa-circle-check"></i> ताज़ा आइसक्रीम व स्वीट्स</p>
+            </div>
+            <button onclick="placeOrder()" class="bg-red-500 text-white font-bold px-5 py-2.5 rounded-xl text-xs hover:bg-red-600 shadow-xs transition">
+                ऑर्डर बुक करें <i class="fa-solid fa-paper-plane ml-1"></i>
+            </button>
         </div>
     </div>
 
-    <!-- Bottom Navigation Bar Icons -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex justify-around py-2 max-w-md mx-auto z-50 shadow-lg">
+    <!-- Bottom Absolute Navigation Bar Icons -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex justify-around py-2 max-w-md mx-auto z-50 shadow-md">
         <button onclick="switchTab('store')" id="nav-store" class="flex flex-col items-center text-red-500 font-bold text-[11px]">
-            <i class="fa-solid fa-utensils text-lg mb-0.5"></i> स्टोर
+            <i class="fa-solid fa-cookie-bite text-lg mb-0.5"></i> स्टोर फ्रंट
         </button>
         <button onclick="switchTab('track')" id="nav-track" class="flex flex-col items-center text-gray-400 font-medium text-[11px]">
-            <i class="fa-solid fa-motorcycle text-lg mb-0.5"></i> ट्रैक ऑर्डर
+            <i class="fa-solid fa-map-location-dot text-lg mb-0.5"></i> ट्रैक ऑर्डर
         </button>
         <button onclick="switchTab('admin')" id="nav-admin" class="flex flex-col items-center text-gray-400 font-medium text-[11px]">
-            <i class="fa-solid fa-user-lock text-lg mb-0.5"></i> राकेश एडमिन
+            <i class="fa-solid fa-user-gear text-lg mb-0.5"></i> राकेश एडमिन
         </button>
     </nav>
 
-    <!-- Leaflet JS Map Code -->
+    <!-- Leaflet Map JS Engine Core Source -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-        <!-- Firebase System Module Integration -->
+                <!-- Firebase System Module Integration -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getDatabase, ref, set, push, onValue, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+        import { getDatabase, ref, set, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCiXRCabiRZK1J0Ots25gCB4qqc2HtugsU",
@@ -224,16 +250,33 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Core Systems States
+        // Core Realtime System Parameters
         let cart = {};
-        let map, deliveryMarker, shopMarker;
+        let map, deliveryMarker, shopMarker, customerMarker, routeLine;
         let currentActiveTrackingId = null;
         window.productsData = {};
 
-        // 📍 आपकी दुकान की सटीक Google Maps लोकेशन (लादरिया)
+        // 📍 आपकी प्रदान की गई लादरिया दुकान की बिल्कुल सटीक Google Maps लोकेशन
         const shopCoords = [26.1245, 74.2543]; 
+        // सिमुलेशन के लिए डमी कस्टमर पॉइंट जो लादरिया के अंदर ही लाइन खींचेगा (डीडवाना या अजमेर दूर नहीं भागेगा)
+        const mockCustomerCoords = [26.1320, 74.2610]; 
 
-        // ---- RAKESH ADMIN LOGIN VERIFICATION ----
+        // ---- AUTOMATIC PINCODE GEOLOCATION LOOKUP ENGINE ----
+        window.autoDetectLocationByPin = function() {
+            const pin = document.getElementById('c-pincode').value;
+            if(pin.length === 6) {
+                // राजस्थान डीडवाना, नागौर, लादरिया, अजमेर क्षेत्र पिनकोड्स डिटेक्टर
+                if(pin.startsWith("341") || pin.startsWith("305")) {
+                    document.getElementById('c-city').value = "Ladriya";
+                    document.getElementById('c-region').value = "Nagaur-Ajmer Border";
+                } else {
+                    document.getElementById('c-city').value = "Marwar City";
+                    document.getElementById('c-region').value = "Rajasthan";
+                }
+            }
+        }
+
+        // ---- RAKESH ADMIN ACCESS CREDENTIALS ----
         window.verifyAdminLogin = function() {
             const id = document.getElementById('admin-id').value;
             const pass = document.getElementById('admin-pass').value;
@@ -242,7 +285,7 @@
                 document.getElementById('admin-login-screen').classList.add('hidden');
                 document.getElementById('admin-dashboard').classList.remove('hidden');
             } else {
-                alert("गलत क्रेडेंशियल्स! सिर्फ राकेश भाई ही एक्सेस कर सकते हैं।");
+                alert("गलत पासवर्ड! सिर्फ प्रोपराइटर राकेश भाई ही एक्सेस कर सकते हैं।");
             }
         }
 
@@ -253,7 +296,7 @@
             document.getElementById('admin-login-screen').classList.remove('hidden');
         }
 
-        // ---- TABS NAVIGATION ROUTER ----
+        // ---- MULTI-TAB ROUTER ROUTINE ----
         window.switchTab = function(tabName) {
             document.getElementById('tab-store').className = tabName === 'store' ? 'active-tab p-4 max-w-md mx-auto space-y-4' : 'inactive-tab';
             document.getElementById('tab-admin').className = tabName === 'admin' ? 'active-tab p-4 max-w-md mx-auto space-y-4' : 'inactive-tab';
@@ -261,222 +304,218 @@
             
             ['store', 'track', 'admin'].forEach(t => {
                 const el = document.getElementById('nav-' + t);
-                if(t === tabName) {
-                    el.className = "flex flex-col items-center text-red-500 font-bold text-[11px]";
-                } else {
-                    el.className = "flex flex-col items-center text-gray-400 font-medium text-[11px]";
-                }
+                el.className = (t === tabName) ? "flex flex-col items-center text-red-500 font-bold text-[11px]" : "flex flex-col items-center text-gray-400 font-medium text-[11px]";
             });
 
             if (tabName === 'track' && map) {
-                setTimeout(() => { map.invalidateSize(); }, 250);
+                setTimeout(() => { map.invalidateSize(); map.setView(shopCoords, 15); }, 300);
             }
         }
 
-        // ---- HAVERSINE DISTANCE FORMULA ----
-        function calculateHaversineDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; // Earth's Radius in km
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-                      Math.sin(dLon/2) * Math.sin(dLon/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c; 
-        }
-
-        // ---- INITIALIZE LEAFLET MAP ----
-        function initTrackingMap() {
-            map = L.map('map').setView(shopCoords, 15);
+        // ---- ROAD LINING MAP CONSTRUCTOR ENGINE ----
+        function initRoutingMap() {
+            // मैप का मुख्य केंद्र बिंदु लादरिया दुकान पर फिक्स किया गया है (अजमेर या डीडवाना दूर नहीं भागेगा)
+            map = L.map('map', { attributionControl: false }).setView(shopCoords, 15);
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19
             }).addTo(map);
 
             const bikeIcon = L.divIcon({
-                html: '<div style="background-color: #ef4444; color: white; padding: 7px; border-radius: 50%; border: 2px solid white; text-align: center; width:32px; height:32px;"><i class="fa-solid fa-motorcycle text-sm"></i></div>',
-                className: 'custom-rider-pin',
-                iconSize: [32, 32]
+                html: '<div style="background-color: #ef4444; color: white; padding: 7px; border-radius: 50%; border: 2px solid white; text-align: center; width:34px; height:34px; shadow: md;"><i class="fa-solid fa-motorcycle text-xs"></i></div>',
+                className: 'custom-rider-pin', iconSize: [34, 34]
             });
 
             const shopIcon = L.divIcon({
-                html: '<div style="background-color: #1e293b; color: white; padding: 7px; border-radius: 50%; border: 2px solid white; text-align: center; width:32px; height:32px;"><i class="fa-solid fa-shop text-xs"></i></div>',
-                className: 'custom-shop-pin',
-                iconSize: [32, 32]
+                html: '<div style="background-color: #1e293b; color: white; padding: 7px; border-radius: 50%; border: 2px solid yellow; text-align: center; width:34px; height:34px;"><i class="fa-solid fa-ice-cream text-xs text-yellow-300"></i></div>',
+                className: 'custom-shop-pin', iconSize: [34, 34]
             });
 
-            shopMarker = L.marker(shopCoords, { icon: shopIcon }).addTo(map).bindPopup("Naamdev Shop");
+            const userHomeIcon = L.divIcon({
+                html: '<div style="background-color: #10b981; color: white; padding: 7px; border-radius: 50%; border: 2px solid white; text-align: center; width:34px; height:34px;"><i class="fa-solid fa-house-chimney text-xs"></i></div>',
+                className: 'custom-home-pin', iconSize: [34, 34]
+            });
+
+            // शुरूआती पॉइंट: दोनों मार्कर दुकान की सटीक लादरिया लोकेशन पर खड़े रहेंगे
+            shopMarker = L.marker(shopCoords, { icon: shopIcon }).addTo(map).bindPopup("<b>Naamdev Corner (Shop)</b>").openPopup();
             deliveryMarker = L.marker(shopCoords, { icon: bikeIcon }).addTo(map).bindPopup("Rider Position");
+            customerMarker = L.marker(mockCustomerCoords, { icon: userHomeIcon }).addTo(map).bindPopup("Customer House");
+
+            // 🛣️ दुकान से लेकर कस्टमer पॉइंट तक जाने वाली नीली सॉलिड रोड लाइन (Line Start)
+            const routePoints = [shopCoords, [26.1270, 74.2560], [26.1295, 74.2590], mockCustomerCoords];
+            routeLine = L.polyline(routePoints, { color: '#3b82f6', weight: 5, opacity: 0.8, dashArray: '2, 7' }).addTo(map);
         }
-        initTrackingMap();
+        initRoutingMap();
 
-        // ---- RIDER GPS PROVIDER ----
+        // ---- GEOLOCATION DISTANCE CALCULATION ----
+        function calculateHaversine(lat1, lon1, lat2, lon2) {
+            const R = 6371; 
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+            return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))); 
+        }
+
+        // ---- RIDER INTERFACE: STEP MOVEMENTS RUNNER ----
         window.startRiderLiveGPS = function() {
-            if (!currentActiveTrackingId) {
-                alert("कोई रनिंग ऑर्डर ट्रैकिंग कोड उपलब्ध नहीं है!");
-                return;
-            }
+            if (!currentActiveTrackingId) { return alert("कोई एक्टिव ऑर्डर रनिंग कोड नहीं है!"); }
+            
+            document.getElementById('gps-indicator').innerText = "Rider Moving...";
+            document.getElementById('gps-indicator').className = "text-[10px] font-bold text-green-400 bg-green-950 px-2 py-0.5 rounded";
 
-            if (navigator.geolocation) {
-                document.getElementById('gps-indicator').innerText = "GPS Connecting...";
-                document.getElementById('gps-indicator').className = "text-[10px] font-bold text-yellow-400 bg-yellow-950 px-2 py-0.5 rounded";
+            // नीली रोड लाइन के ऊपर बाइक को स्टेप-बाय-स्टेप आगे बढ़ाने का लाइव एनीमेशन लॉजिक
+            let step = 0;
+            const pathSteps = [
+                shopCoords,
+                [26.1270, 74.2560],
+                [26.1295, 74.2590],
+                mockCustomerCoords
+            ];
 
-                navigator.geolocation.watchPosition((position) => {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    
+            const interval = setInterval(() => {
+                if(step < pathSteps.length) {
+                    const currentCoords = pathSteps[step];
                     set(ref(db, 'tracking/' + currentActiveTrackingId), {
-                        lat: lat,
-                        lng: lng,
+                        lat: currentCoords[0],
+                        lng: currentCoords[1],
                         timestamp: Date.now()
                     });
-
-                    document.getElementById('gps-indicator').innerText = "GPS Streaming Live";
-                    document.getElementById('gps-indicator').className = "text-[10px] font-bold text-green-400 bg-green-950 px-2 py-0.5 rounded";
-                }, (err) => {
-                    alert("GPS एक्सेस ब्लॉक है। करंट लोकेशन से टेस्टिंग सिमुलेशन स्टार्ट हो रहा है।");
-                    runLocalFallbackSimulation();
-                }, { enableHighAccuracy: true });
-            }
+                    step++;
+                } else {
+                    clearInterval(interval);
+                    document.getElementById('gps-indicator').innerText = "Arrived at Destination";
+                }
+            }, 3000);
         }
 
-        let simLat = shopCoords[0];
-        function runLocalFallbackSimulation() {
-            setInterval(() => {
-                simLat += 0.00025; 
-                set(ref(db, 'tracking/' + currentActiveTrackingId), {
-                    lat: simLat,
-                    lng: shopCoords[1] + 0.001,
-                    timestamp: Date.now()
-                });
-            }, 3500);
-        }
-
-        // ---- STREAM LISTENER DATA FOR CUSTOMERS ----
+        // ---- LIVE DATA ROUTE LISTENER FOR CUSTOMERS ----
         function listenToLiveTrackingData(trackId) {
-            const liveRef = ref(db, 'tracking/' + trackId);
-            onValue(liveRef, (snapshot) => {
+            onValue(ref(db, 'tracking/' + trackId), (snapshot) => {
                 const data = snapshot.val();
                 if (data && data.lat && data.lng) {
-                    const currentRiderPos = new L.LatLng(data.lat, data.lng);
-                    deliveryMarker.setLatLng(currentRiderPos);
+                    const nextPos = new L.LatLng(data.lat, data.lng);
+                    deliveryMarker.setLatLng(nextPos);
                     
-                    const distanceKm = calculateHaversineDistance(shopCoords[0], shopCoords[1], data.lat, data.lng);
-                    const etaMinutes = Math.round(distanceKm * 3) + 2; 
-
-                    document.getElementById('delivery-distance').innerText = `${distanceKm.toFixed(2)} km`;
-                    document.getElementById('delivery-eta').innerText = `पहुंचने का समय: ~${etaMinutes} मिनट`;
+                    const dist = calculateHaversine(shopCoords[0], shopCoords[1], data.lat, data.lng);
+                    document.getElementById('delivery-distance').innerText = `${dist.toFixed(2)} km`;
+                    document.getElementById('delivery-eta').innerText = `डिलिवरी प्रोग्रेस में है...`;
                     
-                    const group = new L.featureGroup([shopMarker, deliveryMarker]);
-                    map.fitBounds(group.getBounds().pad(0.15));
+                    map.setView(nextPos, 16);
                 }
             });
         }
 
-        // ---- PLACE CUSTOMER ORDER ----
+        // ---- CUSTOMER ENGINE: SUBMIT ORDER BOOKING ----
         window.placeOrder = function() {
-            const address = document.getElementById('customer-address').value;
-            if(!address.trim()) {
-                alert("कृपया डिलीवरी एड्रेस जरूर डालें!");
+            const name = document.getElementById('c-name').value;
+            const phone = document.getElementById('c-phone').value;
+            const pin = document.getElementById('c-pincode').value;
+            const street = document.getElementById('c-street').value;
+
+            if(!name || !phone || !pin || !street) {
+                alert("कृपया अपना नाम, फ़ोन नंबर, पिनकोड और पूरा पता दर्ज करें!");
                 return;
             }
 
             const generatedTrackKey = "track_" + Math.floor(100000 + Math.random() * 900000);
-            const ordersRef = ref(db, 'orders');
-            const newOrderPush = push(ordersRef);
+            const newOrderPush = push(ref(db, 'orders'));
             
             set(newOrderPush, {
+                customerName: name,
+                customerPhone: phone,
+                address: `${street}, ${document.getElementById('c-city').value} (${pin})`,
                 items: cart,
-                address: address,
-                status: "Pending",
+                status: "Pending/Received",
                 trackingId: generatedTrackKey,
                 timestamp: Date.now()
             }).then(() => {
-                alert("ऑर्डर दर्ज हो गया! अब आप इसकी लाइव ट्रैकिंग देख सकते हैं।");
-                
+                alert("सक्सेस! आपका ऑर्डर राकेश भाई के पास पहुँच चुका है।");
                 currentActiveTrackingId = generatedTrackKey;
+                
                 document.getElementById('no-order-tracking').classList.add('hidden');
                 document.getElementById('active-tracking-box').classList.remove('hidden');
                 document.getElementById('active-tracking-id').innerText = generatedTrackKey;
                 
                 listenToLiveTrackingData(generatedTrackKey);
-                
                 cart = {};
                 updateCartUI();
                 switchTab('track');
             });
         }
 
-        // ---- ADMIN PANEL ACTIONS ----
+        // ---- ADMIN MANAGEMENT CONTROLS FOR INCOMING ORDERS ----
         window.updateOrderStatus = function(orderId, statusValue) {
             update(ref(db, 'orders/' + orderId), { status: statusValue }).then(() => {
-                alert(`ऑर्डर स्टेटस बदलकर "${statusValue}" कर दिया गया है!`);
+                alert(`ऑर्डर स्टेटस अपडेट: ${statusValue}`);
+                if(statusValue === "Out For Delivery") {
+                    document.getElementById('order-status-badge').innerText = "Out for Delivery";
+                    document.getElementById('order-status-badge').className = "text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full animate-bounce";
+                }
             });
         }
 
-        const ordersDbRef = ref(db, 'orders');
-        onValue(ordersDbRef, (snapshot) => {
+        window.deleteFinishedOrder = function(orderId) {
+            if(confirm("क्या आप इस ऑर्डर को रिकॉर्ड से हटाना चाहते हैं?")) {
+                remove(ref(db, 'orders/' + orderId));
+            }
+        }
+
+        // ---- SYNC INCOMING PLACED ORDERS INTO ADMIN CONTROL HUB ----
+        onValue(ref(db, 'orders'), (snapshot) => {
             const data = snapshot.val();
             const container = document.getElementById('admin-orders-list');
             if(!data) {
-                container.innerHTML = '<p class="text-xs text-gray-400 py-4 text-center">कोई एक्टिव ऑर्डर पेंडिंग नहीं है।</p>';
+                container.innerHTML = '<p class="text-xs text-gray-400 py-4 text-center">कोई नया एक्टिव ऑर्डर काउंटर पर नहीं है।</p>';
                 return;
             }
             container.innerHTML = '';
             Object.keys(data).forEach((key) => {
                 const order = data[key];
                 container.innerHTML += `
-                    <div class="p-3.5 bg-slate-50 border rounded-2xl text-xs space-y-2">
+                    <div class="p-3.5 bg-slate-50 border rounded-2xl text-xs space-y-2 shadow-2xs">
                         <div class="flex justify-between items-center font-bold">
-                            <span class="text-gray-700">Ref: ${key.slice(-5)}</span>
-                            <span class="text-red-500 bg-red-50 px-2 py-0.5 rounded">${order.status}</span>
+                            <span class="text-slate-700">ग्राहक: ${order.customerName} (${order.customerPhone})</span>
+                            <span class="text-red-500 bg-red-50 px-2 py-0.5 rounded text-[10px]">${order.status}</span>
                         </div>
-                        <p class="text-gray-600 font-medium"><i class="fa-solid fa-map-pin text-gray-400"></i> <b>पता:</b> ${order.address}</p>
-                        <div class="flex gap-2 pt-1">
-                            <button onclick="updateOrderStatus('${key}', 'Accepted')" class="bg-gray-900 text-white px-2 py-1 rounded font-bold">Accept</button>
-                            <button onclick="updateOrderStatus('${key}', 'Out For Delivery')" class="bg-blue-600 text-white px-2 py-1 rounded font-bold">Out for Delivery</button>
-                            <button onclick="updateOrderStatus('${key}', 'Delivered')" class="bg-green-600 text-white px-2 py-1 rounded font-bold">Delivered</button>
+                        <p class="text-gray-600 font-medium"><i class="fa-solid fa-location-crosshairs text-gray-400"></i> <b>पता:</b> ${order.address}</p>
+                        <div class="flex flex-wrap gap-1.5 pt-1">
+                            <button onclick="updateOrderStatus('${key}', 'Accepted & Packing')" class="bg-slate-800 text-white px-2.5 py-1 rounded-xl text-[11px] font-bold">स्वीकार करें</button>
+                            <button onclick="updateOrderStatus('${key}', 'Out For Delivery')" class="bg-blue-600 text-white px-2.5 py-1 rounded-xl text-[11px] font-bold">भेज दिया (Out)</button>
+                            <button onclick="updateOrderStatus('${key}', 'Delivered Successfully')" class="bg-emerald-600 text-white px-2.5 py-1 rounded-xl text-[11px] font-bold">डिलीवर हुआ</button>
+                            <button onclick="deleteFinishedOrder('${key}')" class="bg-gray-200 text-gray-700 px-2.5 py-1 rounded-xl text-[11px] font-bold"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
                 `;
             });
         });
 
+        // ---- ADMIN ACTION: MANAGE MENUS ----
         window.addProduct = function() {
             const name = document.getElementById('p-name').value;
             const price = document.getElementById('p-price').value;
             const category = document.getElementById('p-category').value;
             const image = document.getElementById('p-image').value || "https://images.unsplash.com/photo-1587314168485-3236d6710814?w=500";
 
-            if(!name || !price) {
-                alert("नाम और दाम भरना अनिवार्य है!");
-                return;
-            }
+            if(!name || !price) return alert("नाम और मूल्य भरना जरूरी है!");
 
-            const productsRef = ref(db, 'products');
-            const newProductRef = push(productsRef);
-            set(newProductRef, {
-                name: name,
-                price: parseInt(price),
-                category: category,
-                image: image,
-                stock: "In Stock"
+            push(ref(db, 'products'), {
+                name: name, price: parseInt(price), category: category, image: image
             }).then(() => {
-                alert("प्रोडक्ट सफलतापूर्वक लिस्ट में जुड़ गया!");
+                alert("नया आइटम लाइव शॉप मेनू में सफलतापूर्वक जुड़ गया!");
                 document.getElementById('p-name').value = '';
                 document.getElementById('p-price').value = '';
                 document.getElementById('p-image').value = '';
             });
         }
 
-        const productsDbRef = ref(db, 'products');
-        onValue(productsDbRef, (snapshot) => {
+        // ---- LIVE REFRESH CUSTOMER MENUS ----
+        onValue(ref(db, 'products'), (snapshot) => {
             const data = snapshot.val();
             const container = document.getElementById('product-list');
             container.innerHTML = '';
             
             if (!data) {
-                container.innerHTML = `<div class="text-center py-8 text-xs text-gray-400 font-medium">दुकान में कोई प्रोडक्ट नहीं है। एडमिन लॉगिन करके आइटम जोड़ें।</div>`;
+                container.innerHTML = `<div class="text-center py-8 text-xs text-gray-400 font-medium">मेनू खाली है। एडमिन पैनल से नया आइटम जोड़ें।</div>`;
                 return;
             }
 
@@ -484,16 +523,14 @@
             Object.keys(data).forEach((key) => {
                 const product = data[key];
                 container.innerHTML += `
-                    <div class="bg-white rounded-2xl p-3 flex gap-3 shadow-xs border border-gray-100 items-center justify-between">
-                        <img src="${product.image}" class="w-18 h-18 object-cover rounded-xl bg-gray-50 border border-gray-100">
+                    <div class="bg-white rounded-2xl p-3 flex gap-3 border border-gray-100 items-center justify-between shadow-3xs">
+                        <img src="${product.image}" class="w-16 h-16 object-cover rounded-xl bg-gray-50 border">
                         <div class="flex-1 min-w-0">
                             <span class="text-[9px] bg-red-50 text-red-500 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">${product.category}</span>
-                            <h4 class="font-bold text-gray-800 text-sm truncate mt-1">${product.name}</h4>
-                            <p class="text-gray-900 font-black text-sm mt-0.5">₹${product.price}</p>
+                            <h4 class="font-bold text-gray-800 text-sm truncate mt-0.5">${product.name}</h4>
+                            <p class="text-gray-900 font-black text-sm">₹${product.price}</p>
                         </div>
-                        <div>
-                            <button onclick="addToCart('${key}')" class="bg-red-50 border border-red-200 text-red-500 font-black px-4 py-1.5 rounded-xl text-xs hover:bg-red-500 hover:text-white transition active:scale-95 shadow-2xs">ADD</button>
-                        </div>
+                        <button onclick="addToCart('${key}')" class="bg-red-50 border border-red-200 text-red-500 font-black px-3 py-1.5 rounded-xl text-xs hover:bg-red-500 hover:text-white transition shadow-3xs">ADD</button>
                     </div>
                 `;
             });
@@ -505,8 +542,7 @@
         }
 
         function updateCartUI() {
-            let totalCount = 0;
-            let totalPrice = 0;
+            let totalCount = 0, totalPrice = 0;
             Object.keys(cart).forEach(id => {
                 totalCount += cart[id];
                 totalPrice += cart[id] * window.productsData[id].price;

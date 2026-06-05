@@ -1,440 +1,643 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Naamdev Ice Cream Corner & Sweets</title>
-    <!-- Tailwind CSS v4 -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Leaflet.js Maps CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .active-tab { display: block; }
-        .inactive-tab { display: none; }
-        #map { height: 360px; width: 100%; border-radius: 24px; z-index: 1; }
-    </style>
+    <title>Namdev Sweets | Automated Ordering System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
-<body class="bg-slate-50 font-sans pb-24">
+<body class="bg-slate-50 font-sans text-slate-900 antialiased min-h-screen">
 
-    <!-- App Header -->
-    <header class="bg-white shadow-xs sticky top-0 z-50 px-4 py-3 flex justify-between items-center border-b border-gray-100">
-        <div>
-            <h1 class="text-xl font-black text-red-500 tracking-tight flex items-center gap-1">
-                🍦 Naamdev Ice Cream Corner
-            </h1>
-            <p class="text-xs text-gray-500 font-medium"><i class="fa-solid fa-location-dot text-red-500"></i> लादरिया (मुख्य बाज़ार)</p>
-        </div>
-        <div class="flex items-center gap-3">
-            <span id="user-welcome-tag" class="text-xs font-bold text-gray-600"></span>
-            <div class="relative bg-red-50 p-2.5 rounded-full cursor-pointer" onclick="switchTab('store')">
-                <i class="fa-solid fa-bag-shopping text-xl text-red-500"></i>
-                <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center font-black shadow-sm">0</span>
-            </div>
-        </div>
-    </header>
+    <div id="app-root"></div>
 
-    <!-- ================= USER AUTHENTICATION SCREEN (LOGIN / REGISTER) ================= -->
-    <div id="auth-screen" class="p-4 max-w-md mx-auto my-8 space-y-4">
-        <div class="bg-white rounded-3xl p-6 shadow-xl border border-gray-100 space-y-4">
-            <div class="text-center">
-                <h2 id="auth-title" class="text-xl font-black text-gray-800">ग्राहक लॉगिन / रजिस्ट्रेशन</h2>
-                <p class="text-xs text-gray-400 mt-0.5">ऑर्डर करने के लिए अपना अकाउंट खोलें</p>
-            </div>
-            <div class="space-y-3">
-                <input type="text" id="auth-name" placeholder="आपका पूरा नाम (सिर्फ रजिस्ट्रेशन के लिए)" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-red-500 font-medium">
-                <input type="email" id="auth-email" placeholder="ईमेल आईडी (example@gmail.com)" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-red-500 font-medium">
-                <input type="password" id="auth-password" placeholder="6+ अंकों का पासवर्ड सेट करें" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-red-500 font-medium">
-                
-                <div class="grid grid-cols-2 gap-2 pt-2">
-                    <button onclick="handleUserAuth('login')" class="bg-slate-900 hover:bg-black text-white font-bold py-3 rounded-xl text-xs transition shadow-sm">
-                        लॉगइन करें <i class="fa-solid fa-right-to-bracket ml-0.5"></i>
-                    </button>
-                    <button onclick="handleUserAuth('register')" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl text-xs transition shadow-sm">
-                        नया अकाउंट बनाएं <i class="fa-solid fa-user-plus ml-0.5"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ================= MAIN APP CONTENT (HIDDEN UNTIL LOGIN) ================= -->
-    <div id="main-app-content" class="hidden">
-        
-        <!-- ================= 1. STORE FRONT VIEW ================= -->
-        <div id="tab-store" class="active-tab p-4 max-w-md mx-auto space-y-4">
-            <!-- 5KM Fast Delivery Banner -->
-            <div class="bg-gradient-to-br from-red-500 via-pink-600 to-red-600 rounded-3xl p-5 text-white shadow-md relative overflow-hidden">
-                <div class="relative z-10 space-y-1">
-                    <span class="bg-yellow-400 text-slate-900 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow-xs">🚀 5KM FAST DELIVERY</span>
-                    <h2 class="text-xl font-black pt-1">मटर पनीर, बटरस्कॉट केक व आइसक्रीम</h2>
-                    <p class="text-xs opacity-90">लादरिया में हमारी दुकान से 5 किलोमीटर के दायरे में सुपर फ़ास्ट होम डिलीवरी चालू है!</p>
-                </div>
-                <div class="absolute -right-4 -bottom-6 opacity-15 text-8xl font-bold">🛵</div>
-            </div>
-
-            <h3 class="text-gray-800 font-extrabold text-base tracking-tight flex items-center gap-2 pt-2">
-                <span class="w-1 h-5 bg-red-500 rounded-full"></span> लाइव फ्रेश मेनू
-            </h3>
-            <div id="product-list" class="grid grid-cols-1 gap-3.5">
-                <!-- Products load dynamically -->
-            </div>
-        </div>
-        <!-- ================= 2. TRACK LIVE ORDER VIEW ================= -->
-        <div id="tab-track" class="inactive-tab p-4 max-w-md mx-auto space-y-4">
-            <div id="no-order-tracking" class="bg-white rounded-3xl p-8 text-center border shadow-2xs space-y-3">
-                <div class="text-4xl">🛵</div>
-                <h3 class="font-bold text-gray-800">कोई एक्टिव डिलीवरी रनिंग नहीं है</h3>
-                <p class="text-xs text-gray-400 max-w-xs mx-auto">जब स्टोर से नया ऑर्डर बुक होगा, तो यहाँ लादरिया दुकान से आपके घर तक की लाइव रोड लाइन दिखने लगेगी।</p>
-            </div>
-
-            <div id="active-tracking-box" class="hidden space-y-4">
-                <div class="bg-white rounded-3xl p-4 shadow-xs border border-gray-100 flex items-center justify-between">
-                    <div>
-                        <span id="order-status-badge" class="text-[10px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full animate-pulse">Processing Order</span>
-                        <h2 id="delivery-eta" class="text-lg font-black text-gray-800 mt-1">रोड रूट मैप तैयार है...</h2>
-                        <p class="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
-                            <i class="fa-solid fa-road text-red-500"></i> दुकान से डिलीवरी दूरी: <span id="delivery-distance" class="font-bold text-red-500">0.0 km</span>
-                        </p>
-                    </div>
-                </div>
-                
-                <!-- Map Container -->
-                <div class="relative rounded-3xl overflow-hidden shadow-md border border-gray-100 bg-gray-100">
-                    <div id="map"></div>
-                </div>
-
-                <div class="bg-slate-900 text-white rounded-3xl p-4 shadow-lg space-y-2">
-                    <div class="flex justify-between items-center">
-                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">डिलीवरी राइडर GPS सिमुलेटर:</h4>
-                        <span id="gps-indicator" class="text-[10px] font-bold text-red-400 bg-red-950 px-2 py-0.5 rounded">GPS Ready</span>
-                    </div>
-                    <button onclick="startRiderLiveGPS()" class="w-full bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-sm">
-                        <i class="fa-solid fa-location-crosshairs"></i> डिलीवरी बॉय का मूवमेंट शुरू करें (लाइन पर चलेगा)
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================= 3. ADVANCED RAKESH ADMIN PANEL ================= -->
-        <div id="tab-admin" class="inactive-tab p-4 max-w-md mx-auto space-y-4">
-            <div id="admin-login-screen" class="bg-white rounded-3xl p-6 shadow-xl border border-gray-100 text-center space-y-4">
-                <h2 class="text-xl font-black text-gray-800">राकेश भाई लॉगिन पैनल</h2>
-                <input type="text" id="admin-id" placeholder="ID दर्ज करें" class="w-full p-3 bg-gray-50 border rounded-xl text-sm">
-                <input type="password" id="admin-pass" placeholder="••••••" class="w-full p-3 bg-gray-50 border rounded-xl text-sm">
-                <button onclick="verifyAdminLogin()" class="w-full bg-slate-900 text-white font-bold py-3 rounded-xl text-sm">डैशबोर्ड खोलें</button>
-            </div>
-
-            <div id="admin-dashboard" class="hidden space-y-5">
-                <div class="bg-white rounded-3xl p-5 border shadow-xs">
-                    <h2 class="text-base font-black text-slate-800">राकेश भाई (मुख्य एडमिन)</h2>
-                    <!-- Add Stock Form -->
-                    <div class="space-y-3 bg-slate-50 p-4 rounded-2xl mt-3">
-                        <input type="text" id="p-name" placeholder="नाम (जैसे: Mawa Chakki)" class="w-full p-2.5 bg-white border rounded-xl text-sm">
-                        <input type="number" id="p-price" placeholder="कीमत (₹)" class="w-full p-2.5 bg-white border rounded-xl text-sm">
-                        <select id="p-category" class="w-full p-2.5 bg-white border rounded-xl text-sm">
-                            <option value="Ice Cream">Ice Cream</option>
-                            <option value="Sweets">Sweets</option>
-                            <option value="Snacks">Hot Snacks</option>
-                        </select>
-                        <button onclick="addProduct()" class="w-full bg-red-500 text-white font-bold py-2.5 rounded-xl text-xs">लाइव मेनू में जोड़ें</button>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-3xl p-5 border shadow-xs space-y-3">
-                    <h3 class="font-black text-gray-800 text-sm">📦 प्राप्त ग्राहक ऑर्डर्स (मैनेजमेंट काउंटर)</h3>
-                    <div id="admin-orders-list" class="space-y-3"></div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- CUSTOMER CART OVERLAY WITH AUTO-PINCODE FIELDS -->
-    <div id="cart-bar" class="fixed bottom-16 left-0 right-0 bg-white shadow-2xl p-4 hidden max-w-md mx-auto z-40 rounded-t-3xl space-y-3 border-t">
-        <h3 class="font-extrabold text-xs text-gray-700 border-b pb-2">🚚 डिलीवरी डिटेल्स</h3>
-        <div class="grid grid-cols-2 gap-2">
-            <input type="text" id="c-phone" placeholder="मोबाइल नंबर" class="w-full p-2 bg-gray-50 border rounded-xl text-xs">
-            <input type="number" id="c-pincode" oninput="autoDetectLocationByPin()" placeholder="6-डिजिट पिनकोड" class="w-full p-2 bg-gray-50 border rounded-xl text-xs text-red-500 font-bold">
-        </div>
-        <div class="grid grid-cols-2 gap-2">
-            <input type="text" id="c-city" placeholder="सिटी" class="w-full p-2 bg-gray-100 border rounded-xl text-xs font-bold" readonly>
-            <input type="text" id="c-region" placeholder="रीजन" class="w-full p-2 bg-gray-100 border rounded-xl text-xs font-bold" readonly>
-        </div>
-        <input type="text" id="c-street" placeholder="मकान नंबर / गली का नाम" class="w-full p-2 bg-gray-50 border rounded-xl text-xs">
-        
-        <div class="flex justify-between items-center pt-2">
-            <p id="cart-summary" class="text-base font-black text-gray-800">₹0</p>
-            <button onclick="placeOrder()" class="bg-red-500 text-white font-bold px-5 py-2.5 rounded-xl text-xs">ऑर्डर बुक करें</button>
-        </div>
-    </div>
-
-    <!-- Navigation -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around py-2 max-w-md mx-auto z-50">
-        <button onclick="switchTab('store')" id="nav-store" class="flex flex-col items-center text-red-500 font-bold text-[11px]"><i class="fa-solid fa-cookie-bite text-lg mb-0.5"></i>स्टोर</button>
-        <button onclick="switchTab('track')" id="nav-track" class="flex flex-col items-center text-gray-400 font-medium text-[11px]"><i class="fa-solid fa-map-location-dot text-lg mb-0.5"></i>ट्रैक</button>
-        <button onclick="switchTab('admin')" id="nav-admin" class="flex flex-col items-center text-gray-400 font-medium text-[11px]"><i class="fa-solid fa-user-gear text-lg mb-0.5"></i>एडमिन</button>
-    </nav>
-
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getDatabase, ref, set, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { 
+            getFirestore, collection, addDoc, doc, onSnapshot, 
+            updateDoc, query, where, orderBy, setDoc, deleteDoc
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { 
+            getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
+        // --- NAMDEV SWEETS FIREBASE SPECIFIC CONFIGURATION PARAMS ---
         const firebaseConfig = {
             apiKey: "AIzaSyCiXRCabiRZK1J0Ots25gCB4qqc2HtugsU",
             authDomain: "namdev-sweets-4c54f.firebaseapp.com",
-            databaseURL: "https://namdev-sweets-4c54f-default-rtdb.firebaseio.com", 
+            databaseURL: "https://namdev-sweets-4c54f-default-rtdb.firebaseio.com",
             projectId: "namdev-sweets-4c54f",
             storageBucket: "namdev-sweets-4c54f.firebasestorage.app",
             messagingSenderId: "939670079612",
-            appId: "1:939670079612:web:048c93b8e9b7677eaba1f9"
+            appId: "1:939670079612:web:048c93b8e9b7677eaba1f9",
+            measurementId: "G-96TDVDMZTH"
         };
 
+        // Initialize Firebase Engines
         const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+        const db = getFirestore(app);
         const auth = getAuth(app);
 
-        let cart = {};
-        let map, deliveryMarker, shopMarker, customerMarker, routeLine;
-        let currentActiveTrackingId = null;
-        let currentUserData = null;
-        window.productsData = {};
+        // Constant Alert Alarm Link Trigger Source URI
+        const ALARM_AUDIO_URL = "https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg";
+        // AAPKA SPECIFIC CUSTOM PAYMENT QR CODE URL
+        const CUSTOMER_PAYMENT_QR_URL = "https://i.ibb.co/FLB6DJXc/RAKESH-TAILOR-1.jpg";
 
-        // 📍 लादरिया मुख्य बाज़ार के बिल्कुल सटीक Google Maps कोर्डिनेट्स फिक्स कर दिए हैं
-        const shopCoords = [27.0543, 74.4328]; 
-        const mockCustomerCoords = [27.0620, 74.4410]; 
-
-        // ---- USER LOGIN / REGISTER SYSTEM ----
-        window.handleUserAuth = function(type) {
-            const email = document.getElementById('auth-email').value;
-            const password = document.getElementById('auth-password').value;
-            const name = document.getElementById('auth-name').value;
-
-            if(!email || !password) return alert("कृपया ईमेल और पासवर्ड डालें!");
-
-            if(type === 'register') {
-                if(!name) return alert("नया अकाउंट बनाने के लिए अपना नाम भी लिखें!");
-                createUserWithEmailAndPassword(auth, email, password)
-                    .then((userCredential) => {
-                        const user = userCredential.user;
-                        set(ref(db, 'users/' + user.uid), { name: name, email: email });
-                        alert("रजिस्ट्रेशन सफल! आपका स्वागत है।");
-                    }).catch(err => alert("त्रुटि: " + err.message));
-            } else {
-                signInWithEmailAndPassword(auth, email, password)
-                    .then(() => alert("लॉगिन सफल!"))
-                    .catch(err => alert("लॉगिन फेल: " + err.message));
-            }
-        }
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('main-app-content').classList.remove('hidden');
-                onValue(ref(db, 'users/' + user.uid), (snapshot) => {
-                    const data = snapshot.val();
-                    if(data) {
-                        currentUserData = data;
-                        document.getElementById('user-welcome-tag').innerText = `👋 ${data.name}`;
-                    }
-                });
-            } else {
-                document.getElementById('auth-screen').classList.remove('hidden');
-                document.getElementById('main-app-content').classList.add('hidden');
-            }
-        });
-
-        // ---- PINCODE DETECTION ----
-        window.autoDetectLocationByPin = function() {
-            const pin = document.getElementById('c-pincode').value;
-            if(pin.length === 6) {
-                if(pin === "341303" || pin.startsWith("341")) {
-                    document.getElementById('c-city').value = "Ladriya";
-                    document.getElementById('c-region').value = "Nagaur (Didwana-Marwar)";
-                } else {
-                    document.getElementById('c-city').value = "Rajasthan City";
-                    document.getElementById('c-region').value = "Instate";
-                }
-            }
-        }
-
-        // ---- ADMIN MANAGEMENT CREDENTIALS ----
-        window.verifyAdminLogin = function() {
-            const id = document.getElementById('admin-id').value;
-            const pass = document.getElementById('admin-pass').value;
-            if (id === "Rakesh" && pass === "894926Rakesh") {
-                document.getElementById('admin-login-screen').classList.add('hidden');
-                document.getElementById('admin-dashboard').classList.remove('hidden');
-            } else {
-                alert("गलत पासवर्ड!");
-            }
-        }
-
-        window.switchTab = function(tabName) {
-            document.getElementById('tab-store').className = tabName === 'store' ? 'active-tab p-4 max-w-md mx-auto space-y-4' : 'inactive-tab';
-            document.getElementById('tab-admin').className = tabName === 'admin' ? 'active-tab p-4 max-w-md mx-auto space-y-4' : 'inactive-tab';
-            document.getElementById('tab-track').className = tabName === 'track' ? 'active-tab p-4 max-w-md mx-auto space-y-4' : 'inactive-tab';
-            
-            ['store', 'track', 'admin'].forEach(t => {
-                const el = document.getElementById('nav-' + t);
-                el.className = (t === tabName) ? "flex flex-col items-center text-red-500 font-bold text-[11px]" : "flex flex-col items-center text-gray-400 font-medium text-[11px]";
-            });
-
-            if (tabName === 'track' && map) {
-                setTimeout(() => { map.invalidateSize(); map.setView(shopCoords, 15); }, 300);
-            }
-        }
-
-        // ---- MAP CONSTRUCTION ENGINE FIXED ON LADRIYA ----
-        function initRoutingMap() {
-            map = L.map('map', { attributionControl: false }).setView(shopCoords, 15);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-            const bikeIcon = L.divIcon({ html: '<div style="background-color: #ef4444; color: white; padding: 7px; border-radius: 50%; border: 2px solid white; text-align: center; width:34px; height:34px;"><i class="fa-solid fa-motorcycle text-xs"></i></div>', iconSize: [34, 34] });
-            const shopIcon = L.divIcon({ html: '<div style="background-color: #1e293b; color: white; padding: 7px; border-radius: 50%; border: 2px solid yellow; text-align: center; width:34px; height:34px;"><i class="fa-solid fa-ice-cream text-xs text-yellow-300"></i></div>', iconSize: [34, 34] });
-            const homeIcon = L.divIcon({ html: '<div style="background-color: #10b981; color: white; padding: 7px; border-radius: 50%; border: 2px solid white; text-align: center; width:34px; height:34px;"><i class="fa-solid fa-house-chimney text-xs"></i></div>', iconSize: [34, 34] });
-
-            shopMarker = L.marker(shopCoords, { icon: shopIcon }).addTo(map).bindPopup("<b>Namdev Sweets (Shop)</b>").openPopup();
-            deliveryMarker = L.marker(shopCoords, { icon: bikeIcon }).addTo(map);
-            customerMarker = L.marker(mockCustomerCoords, { icon: homeIcon }).addTo(map);
-
-            // 🛣️ दुकान से कस्टमर के घर तक सटीक नीली रोड लाइन की शुरुआत
-            const routePoints = [shopCoords, [27.0570, 74.4350], [27.0595, 74.4380], mockCustomerCoords];
-            routeLine = L.polyline(routePoints, { color: '#3b82f6', weight: 5, opacity: 0.8, dashArray: '2, 7' }).addTo(map);
-        }
-        initRoutingMap();
-
-        window.startRiderLiveGPS = function() {
-            if (!currentActiveTrackingId) return alert("कोई एक्टिव डिलीवरी कोड रनिंग में नहीं है!");
-            document.getElementById('gps-indicator').innerText = "Rider Moving...";
-            
-            let step = 0;
-            const pathSteps = [shopCoords, [27.0570, 74.4350], [27.0595, 74.4380], mockCustomerCoords];
-            const interval = setInterval(() => {
-                if(step < pathSteps.length) {
-                    set(ref(db, 'tracking/' + currentActiveTrackingId), { lat: pathSteps[step][0], lng: pathSteps[step][1] });
-                    step++;
-                } else {
-                    clearInterval(interval);
-                    document.getElementById('gps-indicator').innerText = "Arrived";
-                }
-            }, 2500);
-        }
-
-        onValue(ref(db, 'tracking'), (snapshot) => {
-            if(currentActiveTrackingId) {
-                const data = snapshot.child(currentActiveTrackingId).val();
-                if(data) {
-                    const pos = new L.LatLng(data.lat, data.lng);
-                    deliveryMarker.setLatLng(pos);
-                    map.setView(pos, 16);
-                    document.getElementById('delivery-distance').innerText = "Rider is Moving on Line";
-                }
-            }
-        });
-
-        // ---- SUBMIT ORDER BOOKING ----
-        window.placeOrder = function() {
-            const phone = document.getElementById('c-phone').value;
-            const pin = document.getElementById('c-pincode').value;
-            const street = document.getElementById('c-street').value;
-
-            if(!phone || !pin || !street) return alert("कृपया पूरा विवरण भरें!");
-
-            const trackId = "track_" + Math.floor(100000 + Math.random() * 900000);
-            const newOrderRef = push(ref(db, 'orders'));
-            
-            set(newOrderRef, {
-                customerName: currentUserData ? currentUserData.name : "Grahak",
-                customerPhone: phone,
-                address: `${street}, ${document.getElementById('c-city').value} (${pin})`,
-                items: cart,
-                status: "Pending/Received",
-                trackingId: trackId
-            }).then(() => {
-                alert("ऑर्डर राकेश भाई के पास भेज दिया गया है!");
-                currentActiveTrackingId = trackId;
-                document.getElementById('no-order-tracking').classList.add('hidden');
-                document.getElementById('active-tracking-box').classList.remove('hidden');
-                cart = {};
-                updateCartUI();
-                switchTab('track');
-            });
-        }
-
-        // ---- ADMIN ORDERS LOGIC ----
-        window.updateOrderStatus = function(key, val) {
-            update(ref(db, 'orders/' + key), { status: val }).then(() => alert(`स्टेटस अपडेट हुआ: ${val}`));
-        }
-
-        window.deleteFinishedOrder = function(key) {
-            if(confirm("डिलीट करें?")) remove(ref(db, 'orders/' + key));
-        }
-
-        onValue(ref(db, 'orders'), (snapshot) => {
-            const data = snapshot.val();
-            const container = document.getElementById('admin-orders-list');
-            container.innerHTML = '';
-            if(!data) return container.innerHTML = '<p class="text-xs text-gray-400 text-center">कोई ऑर्डर नहीं है</p>';
-            
-            Object.keys(data).forEach(key => {
-                const o = data[key];
-                container.innerHTML += `
-                    <div class="p-3 bg-slate-50 border rounded-2xl text-xs space-y-1 shadow-3xs">
-                        <div class="flex justify-between font-bold"><span>${o.customerName} (${o.customerPhone})</span><span class="text-red-500">${o.status}</span></div>
-                        <p class="text-gray-500"><b>पता:</b> ${o.address}</p>
-                        <div class="flex gap-1 pt-1">
-                            <button onclick="updateOrderStatus('${key}', 'Accepted')" class="bg-slate-800 text-white px-2 py-1 rounded-lg text-[10px]">स्वीकारें</button>
-                            <button onclick="updateOrderStatus('${key}', 'Out For Delivery')" class="bg-blue-600 text-white px-2 py-1 rounded-lg text-[10px]">भेजें (Out)</button>
-                            <button onclick="deleteFinishedOrder('${key}')" class="bg-gray-200 text-gray-700 px-2 py-1 rounded-lg text-[10px]">हटाएं</button>
-                        </div>
-                    </div>`;
-            });
-        });
-
-        // ---- PRODUCTS SYNC ----
-        window.addProduct = function() {
-            const name = document.getElementById('p-name').value;
-            const price = document.getElementById('p-price').value;
-            const cat = document.getElementById('p-category').value;
-            if(!name || !price) return alert("नाम और मूल्य भरें!");
-            push(ref(db, 'products'), { name: name, price: parseInt(price), category: cat, image: "https://images.unsplash.com/photo-1587314168485-3236d6710814?w=200" });
-            alert("मेनू अपडेट हुआ!");
+        // Global Application State Matrix Store
+        let state = {
+            isAdminView: false,
+            user: null,
+            customerName: "",
+            customerPhone: "",
+            products: [],
+            activeCategory: "Sweets",
+            cart: {}, 
+            activeOrderId: null,
+            showCustomRazorpayPopup: false, 
+            adminOrders: [],
+            audioEnabled: false,
+            scanning: false,
+            saveStatus: ""
         };
 
-        onValue(ref(db, 'products'), (snapshot) => {
-            const data = snapshot.val();
-            const container = document.getElementById('product-list');
-            container.innerHTML = '';
-            if(!data) return;
-            window.productsData = data;
-            Object.keys(data).forEach(key => {
-                const p = data[key];
-                container.innerHTML += `
-                    <div class="bg-white rounded-2xl p-3 flex border items-center justify-between shadow-3xs">
-                        <div>
-                            <span class="text-[9px] text-red-500 font-bold bg-red-50 px-1.5 rounded-full">${p.category}</span>
-                            <h4 class="font-bold text-gray-800 text-sm mt-0.5">${p.name}</h4>
-                            <p class="text-gray-900 font-black">₹${p.price}</p>
+        let html5QrcodeScanner = null;
+        let alarmAudio = new Audio(ALARM_AUDIO_URL);
+        alarmAudio.loop = true;
+
+        // --- GENERAL UI ENGINE RENDER DISPATCHER ---
+        function render() {
+            const root = document.getElementById("app-root");
+            
+            let viewHtml = `
+                <header class="bg-orange-600 text-white px-4 py-3 flex justify-between items-center shadow-md w-full sticky top-0 z-30">
+                    <h1 class="text-xl font-black tracking-tight uppercase cursor-pointer" id="nav-brand">Namdev Sweets</h1>
+                    <button id="toggle-view-btn" class="bg-orange-800 hover:bg-orange-900 px-3 py-1.5 rounded text-xs font-bold uppercase transition">
+                        \${state.isAdminView ? "Switch to Customer Menu" : "Admin Panel Access"}
+                    </button>
+                </header>
+                <main class="max-w-md mx-auto sm:max-w-4xl px-2 py-4 pb-32">
+                    \${state.isAdminView ? (state.user ? renderAdminDashboard() : renderAdminLogin()) : renderCustomerStorefront()}
+                </main>
+            `;
+            
+            root.innerHTML = viewHtml;
+            bindEvents();
+            syncLiveOverlay();
+        }
+
+        // --- CUSTOMER STOREFRONT VIEW ---
+        function renderCustomerStorefront() {
+            const activeCartCount = Object.values(state.cart).reduce((a, b) => a + b, 0);
+            const totalSum = calculateCartTotal();
+
+            return `
+                <div class="space-y-4">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 space-y-3">
+                        <h3 class="text-xs font-black tracking-widest text-slate-400 uppercase">Step 1: Customer Details</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <input type="text" id="cust-name" value="\${state.customerName}" class="p-2.5 text-sm border border-slate-300 rounded focus:ring-2 focus:ring-orange-500 outline-none w-full" placeholder="Enter Your Name">
+                            <input type="tel" id="cust-phone" value="\${state.customerPhone}" class="p-2.5 text-sm border border-slate-300 rounded focus:ring-2 focus:ring-orange-500 outline-none w-full" placeholder="Enter 10-Digit Mobile Number">
                         </div>
-                        <button onclick="addToCart('${key}')" class="bg-red-50 border text-red-500 font-black px-3 py-1.5 rounded-xl text-xs">ADD</button>
-                    </div>`;
+                    </div>
+
+                    <div class="flex gap-2 border-b border-slate-200 pb-1 overflow-x-auto">
+                        \${["Sweets", "Packaged", "Hot Food"].map(cat => \`
+                            <button class="category-tab-btn px-4 py-2 text-xs font-bold uppercase tracking-wider transition border-b-2 \${state.activeCategory === cat ? 'border-orange-600 text-orange-600' : 'border-transparent text-slate-500'}" data-category="\${cat}">
+                                \${cat}
+                            </button>
+                        \`).join('')}
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        \${state.products.filter(p => p.category === state.activeCategory).map(product => {
+                            const qty = state.cart[product.id] || 0;
+                            return \`
+                                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center">
+                                    <div>
+                                        <h4 class="font-bold text-slate-800 text-base">\${product.name}</h4>
+                                        <p class="text-sm font-extrabold text-orange-600 mt-0.5">Rs. \${product.price.toFixed(2)}</p>
+                                    </div>
+                                    \${qty > 0 ? \`
+                                        <div class="flex items-center gap-3 bg-orange-50 border border-orange-200 rounded-lg p-1">
+                                            <button class="cart-qty-btn w-8 h-8 rounded-md bg-orange-600 text-white font-black flex items-center justify-center shadow-sm" data-id="\${product.id}" data-delta="-1">-</button>
+                                            <span class="font-bold text-sm px-1 text-orange-950 font-mono">\${qty}</span>
+                                            <button class="cart-qty-btn w-8 h-8 rounded-md bg-orange-600 text-white font-black flex items-center justify-center shadow-sm" data-id="\${product.id}" data-delta="1">+</button>
+                                        </div>
+                                    \` : \`
+                                        <button class="add-to-cart-btn bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase px-4 py-2.5 rounded-lg transition" data-id="\${product.id}">
+                                            Add Item
+                                        </button>
+                                    \`}
+                                </div>
+                            \`;
+                        }).join('')}
+                    </div>
+
+                    \${activeCartCount > 0 ? \`
+                        <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-xl px-4 py-3 z-20 max-w-md mx-auto sm:max-w-4xl sm:rounded-t-2xl">
+                            <div class="flex justify-between items-center gap-4">
+                                <div>
+                                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">\${activeCartCount} items selected</p>
+                                    <p class="text-lg font-black text-slate-800">Total: Rs. \${totalSum.toFixed(2)}</p>
+                                </div>
+                                <button id="pay-token-btn" class="bg-orange-600 hover:bg-orange-700 text-white font-black text-xs uppercase tracking-widest py-3 px-6 rounded-xl transition shadow-md flex-1 text-center">
+                                    Pay & Get Token
+                                </button>
+                            </div>
+                        </div>
+                    \` : ''}
+                </div>
+                <div id="modal-target-overlay"></div>
+            `;
+        }
+        // --- UI PARTIAL: ADMIN LOGIN ---
+        function renderAdminLogin() {
+            return `
+                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200 mt-8 max-w-sm mx-auto">
+                    <h2 class="text-lg font-bold text-slate-800 mb-4 uppercase tracking-wide">Secure Admin Portal</h2>
+                    <div id="auth-err-frame" class="hidden bg-red-50 text-red-600 p-2.5 rounded text-sm mb-4 border border-red-200 font-medium"></div>
+                    <form id="admin-login-form" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Email System Handle</label>
+                            <input type="email" id="login-email" required class="w-full p-2.5 border border-slate-300 rounded focus:ring-2 focus:ring-orange-500 text-sm outline-none" placeholder="admin@namdevsweets.com">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Secret Key Password</label>
+                            <input type="password" id="login-pass" required class="w-full p-2.5 border border-slate-300 rounded focus:ring-2 focus:ring-orange-500 text-sm outline-none">
+                        </div>
+                        <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded transition text-sm uppercase">
+                            Unlock Dashboard
+                        </button>
+                    </form>
+                </div>
+            `;
+        }
+
+        // --- UI PARTIAL: ADMIN DASHBOARD ---
+        function renderAdminDashboard() {
+            return `
+                <div class="space-y-6">
+                    <div class="bg-slate-900 text-white p-4 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-3 shadow-inner">
+                        <div>
+                            <p class="font-bold text-sm">Live Order Audio Terminal Streamer Status</p>
+                            <p class="text-xs text-slate-400">Continuous sound fires automatically when a new customer order is captured.</p>
+                        </div>
+                        <button id="toggle-audio-alert-btn" class="px-4 py-2 rounded text-xs font-black tracking-wider uppercase transition \${state.audioEnabled ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white animate-pulse'}">
+                            \${state.audioEnabled ? "🔊 System Active" : "🔇 Enable Shop Sound Alert"}
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 space-y-4">
+                            <h3 class="text-lg font-black tracking-tight uppercase text-slate-800 flex items-center gap-2">
+                                <span>Live Requests / Orders</span>
+                                <span class="bg-orange-600 text-white text-xs px-2 py-0.5 rounded-full">\${state.adminOrders.length} Orders</span>
+                            </h3>
+                            
+                            \${state.adminOrders.length === 0 ? \`
+                                <div class="bg-white p-8 rounded-xl text-center border border-dashed border-slate-300 text-slate-400 text-sm font-medium">
+                                    No pending orders. Perfect state sync!
+                                </div>
+                            \` : state.adminOrders.map(order => \`
+                                <div class="bg-white border-2 \${order.paymentStatus === 'PENDING' ? 'border-amber-500' : 'border-emerald-500'} rounded-xl p-4 shadow-sm flex flex-col justify-between gap-4 relative overflow-hidden">
+                                    <div class="absolute top-0 right-0 \${order.paymentStatus === 'PENDING' ? 'bg-amber-500' : 'bg-emerald-500'} text-white font-black text-xs px-3 py-1 rounded-bl uppercase tracking-wider">
+                                        \${order.paymentStatus === 'PENDING' ? 'Wait Payment' : \`TOKEN #\${order.tokenNumber}\`}
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-slate-800 text-base">\${order.customerName}</h4>
+                                        <p class="text-xs text-slate-500 font-mono mb-2">Phone: \${order.customerPhone}</p>
+                                        <ul class="bg-slate-50 rounded-lg p-2.5 space-y-1.5 border border-slate-100">
+                                            \${order.items.map(item => \\\`
+                                                <li class="text-xs flex justify-between font-medium">
+                                                    <span class="text-slate-700">\\\${item.name} <b class="text-orange-600 font-black">×\\\${item.quantity}</b></span>
+                                                    <span class="text-slate-500">Rs. \\\${(item.price * item.quantity).toFixed(2)}</span>
+                                                </li>
+                                            \\\`).join('')}
+                                        </ul>
+                                    </div>
+                                    <div class="flex justify-between items-center border-t border-slate-100 pt-3">
+                                        <div>
+                                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Total Amount</span>
+                                            <span class="text-base font-black text-slate-800">Rs. \${order.totalAmount.toFixed(2)}</span>
+                                        </div>
+                                        <div class="flex gap-2">
+                                            \${order.paymentStatus === 'PENDING' ? \\\`
+                                                <button class="reject-order-btn bg-red-100 text-red-700 text-xs font-bold px-3 py-2 rounded transition hover:bg-red-200" data-id="\\\${order.id}">
+                                                    Reject
+                                                </button>
+                                                <button class="approve-payment-btn bg-amber-600 hover:bg-amber-700 text-white text-xs font-black px-4 py-2 rounded uppercase tracking-wider transition shadow-sm" data-id="\\\${order.id}">
+                                                    Approve Payment & Token
+                                                </button>
+                                            \\\` : \\\`
+                                                <button class="deliver-order-btn bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black px-4 py-2 rounded uppercase tracking-wider transition shadow-sm" data-id="\\\${order.id}">
+                                                    Handover Items
+                                                </button>
+                                            \\\`}
+                                        </div>
+                                    </div>
+                                </div>
+                            \`).join('')}
+                        </div>
+
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-black tracking-tight uppercase text-slate-800">Inventory Creator</h3>
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 space-y-4">
+                                <form id="product-creation-form" class="space-y-3">
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Item Title</label>
+                                        <input type="text" id="prod-name" required class="w-full p-2 border border-slate-300 rounded text-sm outline-none" placeholder="e.g., Kaju Katli">
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Price (INR)</label>
+                                            <input type="number" step="0.01" id="prod-price" required class="w-full p-2 border border-slate-300 rounded text-sm outline-none" placeholder="0.00">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Category</label>
+                                            <select id="prod-category" class="w-full p-2 border border-slate-300 rounded text-sm bg-white outline-none">
+                                                <option value="Sweets">Sweets</option>
+                                                <option value="Packaged">Packaged Goods</option>
+                                                <option value="Hot Food">Hot Food</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Barcode Value (Optional)</label>
+                                        <div class="flex gap-2">
+                                            <input type="text" id="prod-barcode" value="" class="w-full p-2 border border-slate-300 rounded text-sm outline-none font-mono" placeholder="Scanned item text string">
+                                            <button type="button" id="trigger-scan-btn" class="px-3 text-xs font-bold uppercase rounded tracking-wider border transition \${state.scanning ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-700'}">
+                                                \${state.scanning ? 'Stop' : 'Scan Cam'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div id="scanner-viewport-target" class="\${state.scanning ? 'block' : 'hidden'} w-full bg-slate-50 rounded border p-1 overflow-hidden"></div>
+                                    <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-black py-2.5 rounded text-xs uppercase tracking-widest transition shadow-sm">
+                                        Push to Live Menu
+                                    </button>
+                                    <div id="product-status-msg" class="text-center text-xs font-bold text-emerald-700 mt-2"></div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center pt-8">
+                        <button id="admin-logout-btn" class="text-xs text-slate-400 underline font-semibold hover:text-slate-600">Disconnect Admin Device Session</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- RAZORPAY STYLED CUSTOM QR OVERLAY MODAL ---
+        function syncLiveOverlay() {
+            const container = document.getElementById("modal-target-overlay");
+            if (!container || !state.activeOrderId) return;
+
+            onSnapshot(doc(db, "orders", state.activeOrderId), (snapshot) => {
+                if (!snapshot.exists()) {
+                    container.innerHTML = "";
+                    state.activeOrderId = null;
+                    state.showCustomRazorpayPopup = false;
+                    return;
+                }
+                const orderData = snapshot.data();
+                
+                let modalHtml = "";
+                if (orderData.paymentStatus === "PENDING") {
+                    if (state.showCustomRazorpayPopup) {
+                        modalHtml = `
+                            <div class="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 font-sans">
+                                <div class="bg-[#1a2138] text-white rounded-lg shadow-2xl w-full max-w-[360px] overflow-hidden border border-slate-800">
+                                    <div class="bg-[#232c4c] p-4 flex items-center justify-between border-b border-slate-800">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-7 h-7 bg-orange-600 rounded-md flex items-center justify-center font-black text-xs text-white">NS</div>
+                                            <div>
+                                                <h4 class="font-bold text-sm tracking-wide">Namdev Sweets</h4>
+                                                <p class="text-[10px] text-slate-400">Automated QR Self Order</p>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-[10px] text-slate-400 uppercase tracking-widest font-mono">Amount</p>
+                                            <p class="text-sm font-black text-emerald-400">₹\${orderData.totalAmount.toFixed(2)}</p>
+                                        </div>
+                                    </div>
+                                    <div class="p-5 bg-[#1a2138] space-y-4 text-center">
+                                        <div class="bg-blue-900/30 border border-blue-500/40 text-blue-300 py-1.5 px-3 rounded text-[11px] font-semibold tracking-wide uppercase inline-block">
+                                            ⚡ Powered Securely by UPI Direct
+                                        </div>
+                                        <div class="bg-white p-2 rounded-lg inline-block mx-auto border-4 border-[#33426b] shadow-2xl">
+                                            <img src="\${CUSTOMER_PAYMENT_QR_URL}" alt="Payment QR Gateway" class="w-48 h-48 object-contain rounded">
+                                        </div>
+                                        <p class="text-xs text-slate-300 px-2 leading-relaxed">
+                                            Scan via <b class="text-white">PhonePe, GPay, Paytm</b> & process exactly <span class="text-orange-500 font-bold">₹\${orderData.totalAmount.toFixed(2)}</span>
+                                        </p>
+                                    </div>
+                                    <div class="bg-[#232c4c] p-4 flex flex-col gap-2 border-t border-slate-800">
+                                        <button id="custom-rzp-success-trigger-btn" class="w-full bg-[#33933c] hover:bg-green-700 text-white font-bold text-xs uppercase py-3 rounded tracking-wider transition shadow-md">
+                                            I Have Paid Successfully
+                                        </button>
+                                        <button id="custom-rzp-cancel-trigger-btn" class="w-full bg-transparent hover:bg-white/5 text-slate-400 font-medium text-xs py-1.5 transition">
+                                            Cancel Transaction
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        modalHtml = `
+                            <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                                <div class="bg-white rounded-2xl p-6 w-full max-w-sm text-center shadow-2xl space-y-4">
+                                    <div class="w-12 h-12 border-4 border-orange-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                                    <h3 class="font-bold text-slate-800 text-base">Opening Razorpay Checkout Windows...</h3>
+                                    <p class="text-xs text-slate-400 px-2">Establishing direct routing point down to the merchant payment gateway frameset.</p>
+                                </div>
+                            </div>
+                        `;
+                        setTimeout(() => {
+                            state.showCustomRazorpayPopup = true;
+                            render();
+                        }, 800);
+                    }
+                } else if (orderData.paymentStatus === "SUCCESS") {
+                    modalHtml = `
+                        <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                            <div class="bg-white rounded-2xl p-6 w-full max-w-sm text-center shadow-2xl space-y-4">
+                                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl font-black">✓</div>
+                                <div>
+                                    <p class="text-xs font-bold uppercase tracking-widest text-emerald-600">Payment Verified</p>
+                                    <h3 class="text-slate-900 font-bold text-xl mt-0.5">Namdev Sweets Counter</h3>
+                                </div>
+                                <div class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl py-4 my-2">
+                                    <span class="block text-xs font-bold text-slate-400 uppercase tracking-widest">Your Turn Queue</span>
+                                    <span class="text-4xl font-black text-slate-800 tracking-tight block mt-1">TOKEN #\${orderData.tokenNumber || '...'}</span>
+                                </div>
+                                <p class="text-xs text-slate-500 px-2 font-medium">Please show this token number at the counter to collect your fresh sweets!</p>
+                                <div class="pt-2">
+                                    <button id="close-modal-clear-btn" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase py-3 rounded-xl transition tracking-wide shadow-md">Done / Clear Screen</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                container.innerHTML = modalHtml;
+                const confirmPaidBtn = document.getElementById("custom-rzp-success-trigger-btn");
+                if (confirmPaidBtn) {
+                    confirmPaidBtn.onclick = () => {
+                        state.showCustomRazorpayPopup = false;
+                        container.innerHTML = `
+                            <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                                <div class="bg-white rounded-2xl p-6 w-full max-w-sm text-center shadow-2xl space-y-4">
+                                    <div class="w-12 h-12 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                                    <h3 class="font-bold text-slate-800 text-base">Verifying UPI Status Reference...</h3>
+                                    <p class="text-xs text-amber-600 font-semibold bg-amber-50 py-1.5 px-2 rounded">⏳ Awaiting Counter Staff Approval</p>
+                                    <p class="text-[11px] text-slate-400 px-2">Payment verify hote hi aapka token automatic screen par pop-up ho jayega.</p>
+                                </div>
+                            </div>
+                        `;
+                    };
+                }
+
+                const rzpCancelBtn = document.getElementById("custom-rzp-cancel-trigger-btn");
+                if (rzpCancelBtn) {
+                    rzpCancelBtn.onclick = async () => {
+                        if (confirm("Cancel this payment process?")) {
+                            await deleteDoc(doc(db, "orders", state.activeOrderId));
+                            state.activeOrderId = null;
+                            state.showCustomRazorpayPopup = false;
+                            render();
+                        }
+                    };
+                }
+
+                const clearBtn = document.getElementById("close-modal-clear-btn");
+                if (clearBtn) {
+                    clearBtn.onclick = () => {
+                        state.cart = {};
+                        state.activeOrderId = null;
+                        state.showCustomRazorpayPopup = false;
+                        render();
+                    };
+                }
             });
+        }
+
+        // --- APPLICATION CORE BUSINESS MATH LOGIC ---
+        function calculateCartTotal() {
+            return Object.entries(state.cart).reduce((sum, [id, qty]) => {
+                const product = state.products.find(p => p.id === id);
+                return sum + (product ? product.price * qty : 0);
+            }, 0);
+        }
+
+        async function createOrderAndShowQR() {
+            if (!state.customerName.trim() || !state.customerPhone.trim()) {
+                alert("Please provide your Name and Phone Number first.");
+                return;
+            }
+            const totalSum = calculateCartTotal();
+            if (totalSum <= 0) return;
+
+            const compiledItems = Object.entries(state.cart).map(([id, qty]) => {
+                const item = state.products.find(p => p.id === id);
+                return { id, name: item.name, price: item.price, quantity: qty };
+            });
+
+            try {
+                const orderRef = await addDoc(collection(db, "orders"), {
+                    customerName: state.customerName.trim(),
+                    customerPhone: state.customerPhone.trim(),
+                    items: compiledItems,
+                    totalAmount: totalSum,
+                    paymentStatus: "PENDING",
+                    deliveryStatus: "PENDING",
+                    createdAt: new Date().toISOString()
+                });
+                state.activeOrderId = orderRef.id;
+                state.showCustomRazorpayPopup = false; 
+                render(); 
+            } catch (err) {
+                alert("Order Error: " + err.message);
+            }
+        }
+
+        // --- GENERAL ROUTED EVENT LISTENERS SYSTEM ---
+        function bindEvents() {
+            const viewBtn = document.getElementById("toggle-view-btn");
+            if (viewBtn) {
+                viewBtn.onclick = () => {
+                    state.isAdminView = !state.isAdminView;
+                    state.scanning = false;
+                    if (html5QrcodeScanner) html5QrcodeScanner.clear().catch(e => console.log(e));
+                    render();
+                };
+            }
+            
+            const brandLink = document.getElementById("nav-brand");
+            if (brandLink) {
+                brandLink.onclick = () => { state.isAdminView = false; render(); };
+            }
+
+            const nameInp = document.getElementById("cust-name");
+            const phoneInp = document.getElementById("cust-phone");
+            if (nameInp) nameInp.oninput = (e) => state.customerName = e.target.value;
+            if (phoneInp) phoneInp.oninput = (e) => state.customerPhone = e.target.value;
+
+            document.querySelectorAll(".category-tab-btn").forEach(btn => {
+                btn.onclick = () => { state.activeCategory = btn.getAttribute("data-category"); render(); };
+            });
+
+            document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
+                btn.onclick = () => { const id = btn.getAttribute("data-id"); state.cart[id] = 1; render(); };
+            });
+
+            document.querySelectorAll(".cart-qty-btn").forEach(btn => {
+                btn.onclick = () => {
+                    const id = btn.getAttribute("data-id");
+                    const delta = parseInt(btn.getAttribute("data-delta"));
+                    const nextQty = (state.cart[id] || 0) + delta;
+                    if (nextQty <= 0) delete state.cart[id];
+                    else state.cart[id] = nextQty;
+                    render();
+                };
+            });
+
+            const payBtn = document.getElementById("pay-token-btn");
+            if (payBtn) payBtn.onclick = () => createOrderAndShowQR();
+
+            const loginForm = document.getElementById("admin-login-form");
+            if (loginForm) {
+                loginForm.onsubmit = async (e) => {
+                    e.preventDefault();
+                    const email = document.getElementById("login-email").value;
+                    const pass = document.getElementById("login-pass").value;
+                    const errFrame = document.getElementById("auth-err-frame");
+                    try {
+                        await signInWithEmailAndPassword(auth, email, pass);
+                    } catch (err) {
+                        errFrame.classList.remove("hidden");
+                        errFrame.innerText = "Invalid System Credentials Access Token Rejected.";
+                    }
+                };
+            }
+
+            const logoutBtn = document.getElementById("admin-logout-btn");
+            if (logoutBtn) logoutBtn.onclick = () => signOut(auth);
+
+            const audioAlertBtn = document.getElementById("toggle-audio-alert-btn");
+            if (audioAlertBtn) {
+                audioAlertBtn.onclick = () => {
+                    state.audioEnabled = !state.audioEnabled;
+                    if (!state.audioEnabled) alarmAudio.pause();
+                    else if (state.adminOrders.length > 0) alarmAudio.play().catch(e => console.log(e));
+                    render();
+                };
+            }
+
+            document.querySelectorAll(".approve-payment-btn").forEach(btn => {
+                btn.onclick = async () => {
+                    const id = btn.getAttribute("data-id");
+                    if (confirm("Confirm that you received the UPI payment for this order?")) {
+                        const calculatedTokenNum = state.adminOrders.filter(o => o.paymentStatus === 'SUCCESS').length + 1;
+                        try {
+                            await updateDoc(doc(db, "orders", id), { 
+                                paymentStatus: "SUCCESS",
+                                tokenNumber: calculatedTokenNum
+                            });
+                        } catch (e) { alert(e.message); }
+                    }
+                };
+            });
+
+            document.querySelectorAll(".reject-order-btn").forEach(btn => {
+                btn.onclick = async () => {
+                    const id = btn.getAttribute("data-id");
+                    if (confirm("Reject and delete this request?")) {
+                        try { await deleteDoc(doc(db, "orders", id)); } catch(e) { alert(e.message); }
+                    }
+                };
+            });
+
+            document.querySelectorAll(".deliver-order-btn").forEach(btn => {
+                btn.onclick = async () => {
+                    const id = btn.getAttribute("data-id");
+                    try { await updateDoc(doc(db, "orders", id), { deliveryStatus: "DELIVERED" }); } catch (e) { alert(e.message); }
+                };
+            });
+
+            const creationForm = document.getElementById("product-creation-form");
+            if (creationForm) {
+                creationForm.onsubmit = async (e) => {
+                    e.preventDefault();
+                    const name = document.getElementById("prod-name").value;
+                    const price = parseFloat(document.getElementById("prod-price").value);
+                    const category = document.getElementById("prod-category").value;
+                    const barcode = document.getElementById("prod-barcode").value;
+                    const statusMsg = document.getElementById("product-status-msg");
+
+                    try {
+                        const targetId = barcode.trim() ? barcode.trim() : doc(collection(db, "products")).id;
+                        await setDoc(doc(db, "products", targetId), {
+                            name: name.trim(),
+                            price: price,
+                            category: category,
+                            barcode: barcode.trim() || null,
+                            inStock: true,
+                            createdAt: new Date().toISOString()
+                        });
+                        state.scanning = false;
+                        if (html5QrcodeScanner) html5QrcodeScanner.clear().catch(e => console.log(e));
+                        alert("Item added to menu successfully!");
+                        render();
+                    } catch (err) { statusMsg.innerText = "Error: " + err.message; }
+                };
+            }
+
+            const scanBtn = document.getElementById("trigger-scan-btn");
+            if (scanBtn) {
+                scanBtn.onclick = () => {
+                    if (state.scanning) {
+                        state.scanning = false;
+                        if (html5QrcodeScanner) html5QrcodeScanner.clear().catch(e => console.error(e));
+                        render();
+                    } else {
+                        state.scanning = true;
+                        render();
+                        setTimeout(() => {
+                            html5QrcodeScanner = new Html5QrcodeScanner("scanner-viewport-target", {
+                                fps: 15, qrbox: { width: 260, height: 160 }
+                            }, false);
+                            html5QrcodeScanner.render((decodedText) => {
+                                document.getElementById("prod-barcode").value = decodedText;
+                                state.scanning = false;
+                                html5QrcodeScanner.clear().catch(e => console.error(e));
+                                render();
+                            }, (err) => {});
+                        }, 150);
+                    }
+                };
+            }
+        }
+
+        // --- REAL-TIME FIRESTORE DATA CONNECTIONS ---
+        const activeCatalogQuery = query(collection(db, "products"), where("inStock", "==", true));
+        onSnapshot(activeCatalogQuery, (snapshot) => {
+            state.products = [];
+            snapshot.forEach((doc) => { state.products.push({ id: doc.id, ...doc.data() }); });
+            if (!state.isAdminView) render();
         });
 
-        window.addToCart = function(id) { cart[id] = (cart[id] || 0) + 1; updateCartUI(); }
-        function updateCartUI() {
-            let tc = 0, tp = 0;
-            Object.keys(cart).forEach(id => { tc += cart[id]; tp += cart[id] * window.productsData[id].price; });
-            document.getElementById('cart-count').innerText = tc;
-            if(tc > 0) {
-                document.getElementById('cart-bar').classList.remove('hidden');
-                document.getElementById('cart-summary').innerText = `${tc} आइटम | ₹${tp}`;
-            } else { document.getElementById('cart-bar').classList.add('hidden'); }
-        }
+        const liveOrdersQuery = query(collection(db, "orders"), where("deliveryStatus", "==", "PENDING"), orderBy("createdAt", "desc"));
+        onSnapshot(liveOrdersQuery, (snapshot) => {
+            state.adminOrders = [];
+            snapshot.forEach((doc) => { state.adminOrders.push({ id: doc.id, ...doc.data() }); });
+            if (state.adminOrders.length > 0 && state.audioEnabled && state.isAdminView) {
+                alarmAudio.play().catch(e => console.log(e));
+            } else { alarmAudio.pause(); }
+            if (state.isAdminView) render();
+        });
+
+        onAuthStateChanged(auth, (currentUser) => { state.user = currentUser; render(); });
+
+        render();
     </script>
 </body>
 </html>

@@ -36,6 +36,9 @@
             const cartItemsCount = Object.values(state.cart).reduce((a, b) => a + b, 0);
             const totalPrice = calculateTotal();
 
+            // Filter products matching current active category
+            const currentProducts = state.products.filter(p => p.category === state.activeCategory);
+
             root.innerHTML = `
                 <header class="bg-indigo-600 text-white px-4 py-3 shadow-sm sticky top-0 z-40">
                     <h1 class="text-lg font-black tracking-tight">Namdev Ice Cream & Sweets</h1>
@@ -58,9 +61,9 @@
                     </div>
 
                     <div class="space-y-2">
-                        ${state.products.filter(p => p.category === state.activeCategory).length === 0 ? 
+                        ${currentProducts.length === 0 ? 
                             `<p class="text-center text-xs text-gray-400 py-6">Is category me abhi koi maal live nahi hai.</p>` :
-                            state.products.filter(p => p.category === state.activeCategory).map(product => {
+                            currentProducts.map(product => {
                                 const qty = state.cart[product.id] || 0;
                                 return `
                                     <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex justify-between items-center">
@@ -222,10 +225,12 @@
             } catch (e) { alert("Error: " + e.message); }
         }
 
-        // HERE IS THE FIX: Added render() inside onSnapshot so it repaints the screen immediately!
+        // Live real-time stream listener for products
         onSnapshot(collection(db, "products"), (snapshot) => { 
             state.products = []; 
-            snapshot.forEach(doc => state.products.push({ id: doc.id, ...doc.data() })); 
+            snapshot.forEach(doc => {
+                state.products.push({ id: doc.id, ...doc.data() }); 
+            }); 
             render(); 
         });
     </script>

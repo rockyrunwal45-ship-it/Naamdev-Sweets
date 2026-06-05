@@ -12,7 +12,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, doc, onSnapshot, updateDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, onSnapshot, updateDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -106,7 +106,7 @@
                 loginFrm.onsubmit = async (e) => {
                     e.preventDefault();
                     try { await signInWithEmailAndPassword(auth, document.getElementById("email").value, document.getElementById("pass").value); }
-                    catch (err) { alert("Access Denied: Invalid Password Node Setup."); }
+                    catch (err) { alert("Access Denied: Invalid Password Setup."); }
                 };
             }
 
@@ -139,9 +139,17 @@
                     const p = parseFloat(document.getElementById("p-price").value);
                     const c = document.getElementById("p-cat").value;
                     try {
-                        const inlineId = doc(collection(db, "products")).id;
-                        await setDoc(doc(db, "products", inlineId), { name: n.trim(), price: p, category: c, inStock: true, createdAt: new Date().toISOString() });
-                        alert("Item Added Live!"); document.getElementById("p-name").value = ""; document.getElementById("p-price").value = "";
+                        // FIX: Using standardized addDoc to let Firestore auto-generate consistent IDs
+                        await addDoc(collection(db, "products"), { 
+                            name: n.trim(), 
+                            price: p, 
+                            category: c, 
+                            inStock: true, 
+                            createdAt: new Date().toISOString() 
+                        });
+                        alert("Item Added Live!"); 
+                        document.getElementById("p-name").value = ""; 
+                        document.getElementById("p-price").value = "";
                     } catch (err) { alert("Error: " + err.message); }
                 };
             }

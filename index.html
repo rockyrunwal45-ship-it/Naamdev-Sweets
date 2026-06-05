@@ -4,25 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Namdev Ice Cream Corner & Sweets</title>
-    <!-- Tailwind CSS for Modern Minimalist UI -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 text-gray-900 antialiased min-h-screen pb-24">
 
-    <!-- App Container Entry Point -->
     <div id="app-root"></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { 
-            getFirestore, collection, addDoc, doc, onSnapshot, 
-            updateDoc, query, orderBy, setDoc, deleteDoc
-        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { 
-            getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut 
-        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, doc, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Firebase Configuration - Connected to your project database
         const firebaseConfig = {
             apiKey: "AIzaSyCiXRCabiRZK1J0Ots25gCB4qqc2HtugsU",
             authDomain: "namdev-sweets-4c54f.firebaseapp.com",
@@ -36,56 +27,22 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const auth = getAuth(app);
-
-        // Your Actual Payment QR Code Provided
         const SHOP_PAYMENT_QR = "https://i.ibb.co/FLB6DJXc/RAKESH-TAILOR-1.jpg";
 
-        // Simplified Clean State Matrix
-        let state = {
-            isAdmin: false,
-            user: null,
-            activeCategory: "Ice Cream",
-            cart: {},
-            customerName: "",
-            customerPhone: "",
-            activeOrderId: null,
-            products: [],
-            orders: []
-        };
+        let state = { activeCategory: "Ice Cream", cart: {}, customerName: "", customerPhone: "", activeOrderId: null, products: [] };
 
-        // --- CORE RENDER LAYER ---
         function render() {
             const root = document.getElementById("app-root");
-            
-            let html = `
-                <header class="bg-indigo-600 text-white px-4 py-3 flex justify-between items-center shadow-sm sticky top-0 z-40">
-                    <div>
-                        <h1 class="text-lg font-black tracking-tight" id="go-home">Namdev Ice Cream & Sweets</h1>
-                        <p class="text-[10px] text-indigo-200">Main Market, Ladriya</p>
-                    </div>
-                    <button id="toggle-view-btn" class="bg-indigo-800 hover:bg-indigo-900 text-xs font-bold px-3 py-1.5 rounded transition">
-                        ${state.isAdmin ? "Menu View" : "Shop Admin"}
-                    </button>
-                </header>
-
-                <main class="max-w-md mx-auto p-3">
-                    ${state.isAdmin ? (state.user ? renderAdminDashboard() : renderAdminLogin()) : renderCustomerMenu()}
-                </main>
-            `;
-            root.innerHTML = html;
-            bindEvents();
-            syncLiveOrderOverlay();
-        }
-
-        // --- CUSTOMER CLEAN MENU VIEW ---
-        function renderCustomerMenu() {
             const cartItemsCount = Object.values(state.cart).reduce((a, b) => a + b, 0);
             const totalPrice = calculateTotal();
 
-            return `
-                <div class="space-y-4">
-                    <!-- Customer Metadata Info Block -->
+            root.innerHTML = `
+                <header class="bg-indigo-600 text-white px-4 py-3 shadow-sm sticky top-0 z-40">
+                    <h1 class="text-lg font-black tracking-tight">Namdev Ice Cream & Sweets</h1>
+                    <p class="text-[10px] text-indigo-200">Main Market, Ladriya</p>
+                </header>
+
+                <main class="max-w-md mx-auto p-3 space-y-4">
                     <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm space-y-2">
                         <span class="text-[10px] uppercase font-bold tracking-wider text-gray-400 block">Customer Info (For Invoice)</span>
                         <div class="grid grid-cols-2 gap-2">
@@ -94,12 +51,9 @@
                         </div>
                     </div>
 
-                    <!-- Filter Category Segment Pills -->
                     <div class="flex gap-2 border-b border-gray-200 pb-1 overflow-x-auto">
                         ${["Ice Cream", "Sweets", "Cakes", "Hot Snacks"].map(cat => `
-                            <button class="cat-pill px-3 py-1.5 text-xs font-bold whitespace-nowrap rounded-full transition ${state.activeCategory === cat ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600'}" data-cat="${cat}">
-                                ${cat}
-                            </button>
+                            <button class="cat-pill px-3 py-1.5 text-xs font-bold whitespace-nowrap rounded-full transition ${state.activeCategory === cat ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600'}" data-cat="${cat}">${cat}</button>
                         `).join('')}
                     </div>
 
@@ -115,13 +69,11 @@
                                     ${qty > 0 ? `
                                         <div class="flex items-center gap-2 bg-indigo-50 rounded-lg p-1">
                                             <button class="qty-change-btn w-7 h-7 bg-indigo-600 text-white rounded font-bold" data-id="${product.id}" data-delta="-1">-</button>
-                                            <span class="text-xs font-bold px-1 min-w-[16px] text-center">${qty}</span>
+                                            <span class="text-xs font-bold px-1 text-center">${qty}</span>
                                             <button class="qty-change-btn w-7 h-7 bg-indigo-600 text-white rounded font-bold" data-id="${product.id}" data-delta="1">+</button>
                                         </div>
                                     ` : `
-                                        <button class="add-to-cart-btn bg-gray-900 hover:bg-gray-800 text-white text-xs font-bold px-3 py-2 rounded-lg transition" data-id="${product.id}">
-                                            Add
-                                        </button>
+                                        <button class="add-to-cart-btn bg-gray-900 text-white text-xs font-bold px-3 py-2 rounded-lg" data-id="${product.id}">Add</button>
                                     `}
                                 </div>
                             `;
@@ -129,255 +81,26 @@
                     </div>
 
                     ${cartItemsCount > 0 ? `
-                        <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 z-30 max-w-md mx-auto shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+                        <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 z-30 max-w-md mx-auto shadow-md">
                             <div class="flex justify-between items-center gap-3">
                                 <div>
-                                    <p class="text-[10px] text-gray-400 font-bold uppercase">${cartItemsCount} Items Selected</p>
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase">${cartItemsCount} Items</p>
                                     <p class="text-base font-black text-gray-800">Total: ₹${totalPrice}</p>
                                 </div>
-                                <button id="submit-checkout-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase py-3 px-5 rounded-xl flex-1 text-center shadow-sm transition">
-                                    Pay & Generate Order Receipt
-                                </button>
+                                <button id="submit-checkout-btn" class="bg-indigo-600 text-white font-bold text-xs uppercase py-3 px-5 rounded-xl flex-1 text-center shadow-sm">Pay & Get Token</button>
                             </div>
                         </div>
                     ` : ''}
-                </div>
+                </main>
                 <div id="modal-target-layer"></div>
             `;
-        }
-        // --- SECURE AUTHENTICATION TERMINAL INTERFACE ---
-        function renderAdminLogin() {
-            return `
-                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm mt-8">
-                    <h3 class="text-sm font-black text-gray-800 mb-3 uppercase tracking-wide">Admin Access Required</h3>
-                    <form id="auth-form" class="space-y-3">
-                        <input type="email" id="auth-email" placeholder="Admin Email" required class="w-full p-2 text-sm border border-gray-200 rounded outline-none focus:border-indigo-500">
-                        <input type="password" id="auth-pass" placeholder="Password" required class="w-full p-2 text-sm border border-gray-200 rounded outline-none focus:border-indigo-500">
-                        <button type="submit" class="w-full bg-gray-900 text-white py-2 text-xs font-bold rounded uppercase tracking-wider">Login</button>
-                    </form>
-                </div>
-            `;
+            bindEvents();
+            syncLiveOrderOverlay();
         }
 
-        // --- ADMINISTRATIVE LIVE ORDER FEED DASHBOARD ---
-        function renderAdminDashboard() {
-            return `
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center">
-                        <h2 class="text-base font-black uppercase text-gray-800">Live Orders Engine</h2>
-                        <button id="admin-logout" class="text-xs text-red-500 underline font-semibold">Logout</button>
-                    </div>
-
-                    <div class="space-y-3">
-                        ${state.orders.length === 0 ? '<p class="text-center text-xs text-gray-400 py-6 font-medium">No live incoming orders found.</p>' : state.orders.map(order => `
-                            <div class="bg-white p-3 rounded-xl border-2 ${order.paymentStatus === 'PENDING' ? 'border-amber-400' : 'border-emerald-500'} shadow-sm space-y-2">
-                                <div class="flex justify-between items-start">
-                                    <div>
-                                        <h4 class="font-bold text-sm text-gray-900">${order.customerName}</h4>
-                                        <p class="text-[11px] text-gray-500">Phone: ${order.customerPhone}</p>
-                                    </div>
-                                    <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded ${order.paymentStatus === 'PENDING' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">
-                                        ${order.paymentStatus === 'PENDING' ? 'Unpaid' : `TOKEN #${order.tokenNumber}`}
-                                    </span>
-                                </div>
-                                <div class="bg-gray-50 rounded p-2 text-xs text-gray-700 font-medium">
-                                    ${order.items.map(i => `<div>• ${i.name} <span class="text-indigo-600 font-bold">x${i.quantity}</span></div>`).join('')}
-                                </div>
-                                <div class="flex justify-between items-center pt-1 border-t border-gray-100">
-                                    <span class="text-sm font-black text-gray-800">₹${order.totalAmount}</span>
-                                    <div class="flex gap-1.5">
-                                        ${order.paymentStatus === 'PENDING' ? `
-                                            <button class="reject-btn bg-red-50 text-red-600 text-[11px] px-2.5 py-1.5 rounded font-bold" data-id="${order.id}">Reject</button>
-                                            <button class="approve-btn bg-emerald-600 text-white text-[11px] px-3 py-1.5 rounded font-bold" data-id="${order.id}">Confirm Paid</button>
-                                        ` : `
-                                            <button class="deliver-btn bg-gray-900 text-white text-[11px] px-3 py-1.5 rounded font-bold" data-id="${order.id}">Deliver / Clear</button>
-                                        `}
-                                    </div>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-
-                    <div class="bg-white p-4 rounded-xl border border-gray-200 mt-6 shadow-sm">
-                        <span class="text-xs font-black uppercase text-gray-400 block mb-2">Quick Menu Manager</span>
-                        <form id="add-product-form" class="space-y-2.5">
-                            <input type="text" id="p-name" placeholder="Item Name (e.g., Butterscotch Cake)" required class="w-full p-2 text-xs border border-gray-200 rounded outline-none">
-                            <div class="grid grid-cols-2 gap-2">
-                                <input type="number" id="p-price" placeholder="Price (₹)" required class="w-full p-2 text-xs border border-gray-200 rounded outline-none">
-                                <select id="p-cat" class="w-full p-2 text-xs border border-gray-200 rounded bg-white outline-none">
-                                    <option value="Ice Cream">Ice Cream</option>
-                                    <option value="Sweets">Sweets</option>
-                                    <option value="Cakes">Cakes</option>
-                                    <option value="Hot Snacks">Hot Snacks</option>
-                                </select>
-                            </div>
-                            <button type="submit" class="w-full bg-indigo-600 text-white py-2 text-xs font-bold rounded uppercase tracking-wide">Publish To Live Menu</button>
-                        </form>
-                    </div>
-                </div>
-            `;
-        }
-
-        // --- INTERACTIVE RAZORPAY STYLED OVERLAY MODAL MANAGER ---
-        function syncLiveOrderOverlay() {
-            const container = document.getElementById("modal-target-layer");
-            if (!container || !state.activeOrderId) return;
-
-            onSnapshot(doc(db, "orders", state.activeOrderId), (snapshot) => {
-                if (!snapshot.exists()) {
-                    container.innerHTML = "";
-                    state.activeOrderId = null;
-                    return;
-                }
-                const order = snapshot.data();
-                let modalHtml = "";
-
-                if (order.paymentStatus === "PENDING") {
-                    modalHtml = `
-                        <div class="fixed inset-0 bg-black/70 flex items-center justify-center p-3 z-50 font-sans animate-fade-in">
-                            <div class="bg-[#1a2138] text-white rounded-xl shadow-2xl w-full max-w-[340px] overflow-hidden border border-slate-800">
-                                <div class="bg-[#232c4c] p-3 flex items-center justify-between border-b border-slate-800">
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-6 h-6 bg-indigo-600 rounded flex items-center justify-center font-black text-[10px]">NC</div>
-                                        <div>
-                                            <h4 class="font-bold text-xs">Namdev Ice Cream Corner</h4>
-                                            <p class="text-[9px] text-gray-400">Merchant Payment Gateway</p>
-                                        </div>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="text-[8px] text-gray-400 uppercase tracking-wider font-mono">Amount Due</p>
-                                        <p class="text-xs font-black text-emerald-400">₹${order.totalAmount.toFixed(2)}</p>
-                                    </div>
-                                </div>
-                                <div class="p-4 bg-[#1a2138] text-center space-y-3">
-                                    <div class="bg-indigo-950 border border-indigo-500/30 text-indigo-300 py-1 px-2.5 rounded text-[10px] font-medium tracking-wide inline-block">
-                                        ⚡ Razorpay Secure Checkout UPI Link
-                                    </div>
-                                    <div class="bg-white p-1.5 rounded-lg inline-block mx-auto border-4 border-[#33426b]">
-                                        <img src="${SHOP_PAYMENT_QR}" alt="Scan to Pay" class="w-44 h-44 object-contain rounded">
-                                    </div>
-                                    <p class="text-[11px] text-slate-300 px-1 leading-relaxed">
-                                        Scan using <b class="text-white">PhonePe, GPay, or Paytm</b> & complete payment of <span class="text-indigo-400 font-bold">₹${order.totalAmount.toFixed(2)}</span>
-                                    </p>
-                                </div>
-                                <div class="bg-[#232c4c] p-3 flex flex-col gap-1.5 border-t border-slate-800">
-                                    <button id="success-paid-btn" class="w-full bg-[#2bb343] hover:bg-green-700 text-white font-bold text-xs uppercase py-2.5 rounded transition tracking-wider shadow-sm">
-                                        I Have Transferred Cash / Paid Successfully
-                                    </button>
-                                    <button id="cancel-pay-btn" class="w-full bg-transparent text-slate-400 text-[10px] font-medium py-1 transition hover:text-white">
-                                        Cancel & Void Order
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                } else if (order.paymentStatus === "SUCCESS") {
-                    modalHtml = `
-                        <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-3 z-50">
-                            <div class="bg-white rounded-2xl p-5 w-full max-w-xs text-center shadow-xl space-y-3.5 border border-gray-100">
-                                <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-xl font-black">✓</div>
-                                <div>
-                                    <p class="text-[10px] font-black uppercase tracking-widest text-emerald-600">Digital Invoice / Token Receipt</p>
-                                    <h3 class="text-gray-900 font-bold text-base mt-0.5">Namdev Ice Cream Corner</h3>
-                                </div>
-                                <div class="bg-gray-50 border border-dashed border-gray-200 rounded-xl py-3 my-1">
-                                    <span class="block text-[10px] font-bold text-gray-400 uppercase">Order Queue Number</span>
-                                    <span class="text-3xl font-black text-gray-800 block mt-0.5">TOKEN #${order.tokenNumber || '...'}</span>
-                                </div>
-                                <div class="text-left text-xs text-gray-600 bg-gray-50 p-2.5 rounded space-y-1 font-medium">
-                                    <div><b>Items:</b></div>
-                                    ${order.items.map(i => `<div class="flex justify-between"><span>${i.name} x${i.quantity}</span><span>₹${i.price * i.quantity}</span></div>`).join('')}
-                                    <div class="border-t border-gray-200 pt-1 mt-1 font-bold flex justify-between text-gray-800">
-                                        <span>Total Amount Paid</span><span>₹${order.totalAmount}</span>
-                                    </div>
-                                </div>
-                                <button id="invoice-done-btn" class="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold text-xs uppercase py-2.5 rounded-xl transition">Done / Clear Frame</button>
-                            </div>
-                        </div>
-                    `;
-                }
-
-                container.innerHTML = modalHtml;
-                // Bind Operational Actions Matrix Inside Active Modal Instance Context Scope
-                const pBtn = document.getElementById("success-paid-btn");
-                if (pBtn) pBtn.onclick = () => {
-                    container.innerHTML = `
-                        <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-3 z-50">
-                            <div class="bg-white rounded-xl p-5 w-full max-w-xs text-center shadow-lg space-y-3">
-                                <div class="w-9 h-9 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-                                <h4 class="font-bold text-gray-800 text-sm">Verifying Digital Transaction Status...</h4>
-                                <p class="text-xs text-amber-600 font-bold bg-amber-50 py-1 px-2 rounded">⏳ Awaiting Counter Staff Verification</p>
-                                <p class="text-[10px] text-gray-400">Jaise hi shop owner verification confirm karenge, aapka valid Token and Invoice yahan load ho jayega.</p>
-                            </div>
-                        </div>
-                    `;
-                };
-
-                const cBtn = document.getElementById("cancel-pay-btn");
-                if (cBtn) cBtn.onclick = async () => {
-                    if (confirm("Cancel and drop this checkout instance?")) {
-                        await deleteDoc(doc(db, "orders", state.activeOrderId));
-                        state.activeOrderId = null;
-                        render();
-                    }
-                };
-
-                const dBtn = document.getElementById("invoice-done-btn");
-                if (dBtn) dBtn.onclick = () => {
-                    state.cart = {};
-                    state.activeOrderId = null;
-                    render();
-                };
-            });
-        }
-
-        // --- MATHEMATICAL MATH FUNCTIONS UTILITY MATRIX ---
-        function calculateTotal() {
-            return Object.entries(state.cart).reduce((sum, [id, qty]) => {
-                const prod = state.products.find(p => p.id === id);
-                return sum + (prod ? prod.price * qty : 0);
-            }, 0);
-        }
-
-        async function triggerOrderAndCheckout() {
-            if (!state.customerName.trim() || !state.customerPhone.trim()) {
-                alert("Please provide your Name and Mobile Number to generate invoice.");
-                return;
-            }
-            const amt = calculateTotal();
-            if (amt <= 0) return;
-
-            const structuredItems = Object.entries(state.cart).map(([id, qty]) => {
-                const prod = state.products.find(p => p.id === id);
-                return { id, name: prod.name, price: prod.price, quantity: qty };
-            });
-
-            try {
-                const ref = await addDoc(collection(db, "orders"), {
-                    customerName: state.customerName.trim(),
-                    customerPhone: state.customerPhone.trim(),
-                    items: structuredItems,
-                    totalAmount: amt,
-                    paymentStatus: "PENDING",
-                    deliveryStatus: "PENDING",
-                    createdAt: new Date().toISOString()
-                });
-                state.activeOrderId = ref.id;
-                render();
-            } catch (e) { alert("Checkout Sync Interrupted: " + e.message); }
-        }
-
-        // --- SYSTEM CORE INPUT HANDLER CONNECTIONS MAPPER ---
         function bindEvents() {
-            const tBtn = document.getElementById("toggle-view-btn");
-            if (tBtn) tBtn.onclick = () => { state.isAdmin = !state.isAdmin; render(); };
-
-            const home = document.getElementById("go-home");
-            if (home) home.onclick = () => { state.isAdmin = false; render(); };
-
             const nameIn = document.getElementById("c-name");
             if (nameIn) nameIn.oninput = (e) => state.customerName = e.target.value;
-            
             const phoneIn = document.getElementById("c-phone");
             if (phoneIn) phoneIn.oninput = (e) => state.customerPhone = e.target.value;
 
@@ -402,80 +125,101 @@
 
             const submitBtn = document.getElementById("submit-checkout-btn");
             if (submitBtn) submitBtn.onclick = () => triggerOrderAndCheckout();
-
-            const authFrm = document.getElementById("auth-form");
-            if (authFrm) authFrm.onsubmit = async (e) => {
-                e.preventDefault();
-                try {
-                    await signInWithEmailAndPassword(auth, document.getElementById("auth-email").value, document.getElementById("auth-pass").value);
-                } catch (err) { alert("Access Blocked: Invalid Credentials."); }
-            };
-
-            const lOut = document.getElementById("admin-logout");
-            if (lOut) lOut.onclick = () => signOut(auth);
-
-            document.querySelectorAll(".approve-btn").forEach(btn => {
-                btn.onclick = async () => {
-                    const id = btn.getAttribute("data-id");
-                    if (confirm("Confirm that you verified and received this cash/UPI transfer amount?")) {
-                        const tokenNum = state.orders.filter(o => o.paymentStatus === 'SUCCESS').length + 1;
-                        try {
-                            await updateDoc(doc(db, "orders", id), { paymentStatus: "SUCCESS", tokenNumber: tokenNum });
-                        } catch (e) { alert(e.message); }
-                    }
-                };
-            });
-
-            document.querySelectorAll(".reject-btn").forEach(btn => {
-                btn.onclick = async () => {
-                    const id = btn.getAttribute("data-id");
-                    if (confirm("Reject and completely remove this pending order?")) {
-                        try { await deleteDoc(doc(db, "orders", id)); } catch(e) { alert(e.message); }
-                    }
-                };
-            });
-
-            document.querySelectorAll(".deliver-btn").forEach(btn => {
-                btn.onclick = async () => {
-                    const id = btn.getAttribute("data-id");
-                    try { await updateDoc(doc(db, "orders", id), { deliveryStatus: "DELIVERED" }); } catch (e) { alert(e.message); }
-                };
-            });
-
-            const addProdFrm = document.getElementById("add-product-form");
-            if (addProdFrm) addProdFrm.onsubmit = async (e) => {
-                e.preventDefault();
-                const n = document.getElementById("p-name").value;
-                const p = parseFloat(document.getElementById("p-price").value);
-                const c = document.getElementById("p-cat").value;
-                try {
-                    const inlineId = doc(collection(db, "products")).id;
-                    await setDoc(doc(db, "products", inlineId), { name: n.trim(), price: p, category: c, inStock: true, createdAt: new Date().toISOString() });
-                    alert("Menu Item Published Live!");
-                    render();
-                } catch (err) { alert("Database Insertion Halt: " + err.message); }
-            };
         }
 
-        // --- REAL-TIME STREAM CONNECTIONS LAYER ---
-        onSnapshot(collection(db, "products"), (snapshot) => {
-            state.products = [];
-            snapshot.forEach(doc => state.products.push({ id: doc.id, ...doc.data() }));
-            if (!state.isAdmin) render();
-        });
+        function syncLiveOrderOverlay() {
+            const container = document.getElementById("modal-target-layer");
+            if (!container || !state.activeOrderId) return;
 
-        onSnapshot(collection(db, "orders"), (snapshot) => {
-            state.orders = [];
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                if (data.deliveryStatus === "PENDING") state.orders.push({ id: doc.id, ...data });
+            onSnapshot(doc(db, "orders", state.activeOrderId), (snapshot) => {
+                if (!snapshot.exists()) { container.innerHTML = ""; state.activeOrderId = null; return; }
+                const order = snapshot.data();
+                let modalHtml = "";
+
+                if (order.paymentStatus === "PENDING") {
+                    modalHtml = `
+                        <div class="fixed inset-0 bg-black/70 flex items-center justify-center p-3 z-50 font-sans">
+                            <div class="bg-[#1a2138] text-white rounded-xl shadow-2xl w-full max-w-[340px] overflow-hidden border border-slate-800">
+                                <div class="bg-[#232c4c] p-3 flex items-center justify-between border-b border-slate-800">
+                                    <div>
+                                        <h4 class="font-bold text-xs">Namdev Ice Cream Corner</h4>
+                                        <p class="text-[9px] text-gray-400">Payment Gateway</p>
+                                    </div>
+                                    <p class="text-xs font-black text-emerald-400">₹${order.totalAmount.toFixed(2)}</p>
+                                </div>
+                                <div class="p-4 bg-[#1a2138] text-center space-y-3">
+                                    <div class="bg-indigo-950 border border-indigo-500/30 text-indigo-300 py-1 px-2.5 rounded text-[10px] font-medium tracking-wide inline-block">⚡ Razorpay Style Secure UPI Link</div>
+                                    <div class="bg-white p-1.5 rounded-lg inline-block mx-auto border-4 border-[#33426b]"><img src="${SHOP_PAYMENT_QR}" alt="Scan to Pay" class="w-44 h-44 object-contain rounded"></div>
+                                    <p class="text-[11px] text-slate-300 px-1">Scan using any UPI App & Pay exactly <span class="text-indigo-400 font-bold">₹${order.totalAmount.toFixed(2)}</span></p>
+                                </div>
+                                <div class="bg-[#232c4c] p-3 flex flex-col gap-1.5 border-t border-slate-800">
+                                    <button id="success-paid-btn" class="w-full bg-[#2bb343] text-white font-bold text-xs uppercase py-2.5 rounded tracking-wider shadow-sm">I Have Paid Successfully</button>
+                                    <button id="cancel-pay-btn" class="w-full bg-transparent text-slate-400 text-[10px] font-medium py-1">Cancel Order</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else if (order.paymentStatus === "SUCCESS") {
+                    modalHtml = `
+                        <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-3 z-50">
+                            <div class="bg-white rounded-2xl p-5 w-full max-w-xs text-center shadow-xl space-y-3.5 border border-gray-100">
+                                <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-xl font-black">✓</div>
+                                <div>
+                                    <p class="text-[10px] font-black uppercase tracking-widest text-emerald-600">Digital Invoice / Token Receipt</p>
+                                    <h3 class="text-gray-900 font-bold text-base mt-0.5">Namdev Ice Cream Corner</h3>
+                                </div>
+                                <div class="bg-gray-50 border border-dashed border-gray-200 rounded-xl py-3 my-1">
+                                    <span class="block text-[10px] font-bold text-gray-400 uppercase">Order Queue Number</span>
+                                    <span class="text-3xl font-black text-gray-800 block mt-0.5">TOKEN #${order.tokenNumber || '...'}</span>
+                                </div>
+                                <div class="text-left text-xs text-gray-600 bg-gray-50 p-2.5 rounded space-y-1 font-medium">
+                                    <div><b>Items:</b></div>
+                                    ${order.items.map(i => `<div class="flex justify-between"><span>${i.name} x${i.quantity}</span><span>₹${i.price * i.quantity}</span></div>`).join('')}
+                                    <div class="border-t border-gray-200 pt-1 mt-1 font-bold flex justify-between text-gray-800"><span>Total Paid</span><span>₹${order.totalAmount}</span></div>
+                                </div>
+                                <button id="invoice-done-btn" class="w-full bg-gray-900 text-white font-bold text-xs uppercase py-2.5 rounded-xl">Close / Clear Screen</button>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                container.innerHTML = modalHtml;
+
+                const pBtn = document.getElementById("success-paid-btn");
+                if (pBtn) pBtn.onclick = () => {
+                    container.innerHTML = `
+                        <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-3 z-50">
+                            <div class="bg-white rounded-xl p-5 w-full max-w-xs text-center shadow-lg space-y-3">
+                                <div class="w-9 h-9 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                                <h4 class="font-bold text-gray-800 text-sm">Verifying UPI Status...</h4>
+                                <p class="text-xs text-amber-600 font-bold bg-amber-50 py-1 px-2 rounded">⏳ Awaiting Counter Approval</p>
+                                <p class="text-[10px] text-gray-400">Counter se order verify hote hi aapka Token aur Invoice screen par aa jayega.</p>
+                            </div>
+                        </div>
+                    `;
+                };
+
+                const cBtn = document.getElementById("cancel-pay-btn");
+                if (cBtn) cBtn.onclick = async () => { if (confirm("Cancel order?")) { await deleteDoc(doc(db, "orders", state.activeOrderId)); state.activeOrderId = null; render(); } };
+
+                const dBtn = document.getElementById("invoice-done-btn");
+                if (dBtn) dBtn.onclick = () => { state.cart = {}; state.activeOrderId = null; render(); };
             });
-            if (state.isAdmin) render();
-        });
+        }
 
-        onAuthStateChanged(auth, (usr) => { state.user = usr; render(); });
+        function calculateTotal() { return Object.entries(state.cart).reduce((sum, [id, qty]) => { const prod = state.products.find(p => p.id === id); return sum + (prod ? prod.price * qty : 0); }, 0); }
 
-        render();
+        async function triggerOrderAndCheckout() {
+            if (!state.customerName.trim() || !state.customerPhone.trim()) { alert("Please enter Name and Mobile Number."); return; }
+            const amt = calculateTotal(); if (amt <= 0) return;
+            const structuredItems = Object.entries(state.cart).map(([id, qty]) => { const prod = state.products.find(p => p.id === id); return { id, name: prod.name, price: prod.price, quantity: qty }; });
+            try {
+                const ref = await addDoc(collection(db, "orders"), { customerName: state.customerName.trim(), customerPhone: state.customerPhone.trim(), items: structuredItems, totalAmount: amt, paymentStatus: "PENDING", deliveryStatus: "PENDING", createdAt: new Date().toISOString() });
+                state.activeOrderId = ref.id; render();
+            } catch (e) { alert("Error: " + e.message); }
+        }
+
+        onSnapshot(collection(db, "products"), (snapshot) => { state.products = []; snapshot.forEach(doc => state.products.push({ id: doc.id, ...doc.data() })); render(); });
     </script>
 </body>
 </html>

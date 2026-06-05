@@ -58,26 +58,29 @@
                     </div>
 
                     <div class="space-y-2">
-                        ${state.products.filter(p => p.category === state.activeCategory).map(product => {
-                            const qty = state.cart[product.id] || 0;
-                            return `
-                                <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex justify-between items-center">
-                                    <div>
-                                        <h4 class="font-bold text-gray-800 text-sm">${product.name}</h4>
-                                        <p class="text-xs font-extrabold text-indigo-600 mt-0.5">₹${product.price}</p>
-                                    </div>
-                                    ${qty > 0 ? `
-                                        <div class="flex items-center gap-2 bg-indigo-50 rounded-lg p-1">
-                                            <button class="qty-change-btn w-7 h-7 bg-indigo-600 text-white rounded font-bold" data-id="${product.id}" data-delta="-1">-</button>
-                                            <span class="text-xs font-bold px-1 text-center">${qty}</span>
-                                            <button class="qty-change-btn w-7 h-7 bg-indigo-600 text-white rounded font-bold" data-id="${product.id}" data-delta="1">+</button>
+                        ${state.products.filter(p => p.category === state.activeCategory).length === 0 ? 
+                            `<p class="text-center text-xs text-gray-400 py-6">Is category me abhi koi maal live nahi hai.</p>` :
+                            state.products.filter(p => p.category === state.activeCategory).map(product => {
+                                const qty = state.cart[product.id] || 0;
+                                return `
+                                    <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex justify-between items-center">
+                                        <div>
+                                            <h4 class="font-bold text-gray-800 text-sm">${product.name}</h4>
+                                            <p class="text-xs font-extrabold text-indigo-600 mt-0.5">₹${product.price}</p>
                                         </div>
-                                    ` : `
-                                        <button class="add-to-cart-btn bg-gray-900 text-white text-xs font-bold px-3 py-2 rounded-lg" data-id="${product.id}">Add</button>
-                                    `}
-                                </div>
-                            `;
-                        }).join('')}
+                                        ${qty > 0 ? `
+                                            <div class="flex items-center gap-2 bg-indigo-50 rounded-lg p-1">
+                                                <button class="qty-change-btn w-7 h-7 bg-indigo-600 text-white rounded font-bold" data-id="${product.id}" data-delta="-1">-</button>
+                                                <span class="text-xs font-bold px-1 text-center">${qty}</span>
+                                                <button class="qty-change-btn w-7 h-7 bg-indigo-600 text-white rounded font-bold" data-id="${product.id}" data-delta="1">+</button>
+                                            </div>
+                                        ` : `
+                                            <button class="add-to-cart-btn bg-gray-900 text-white text-xs font-bold px-3 py-2 rounded-lg" data-id="${product.id}">Add</button>
+                                        `}
+                                    </div>
+                                `;
+                            }).join('')
+                        }
                     </div>
 
                     ${cartItemsCount > 0 ? `
@@ -148,7 +151,7 @@
                                     <p class="text-xs font-black text-emerald-400">₹${order.totalAmount.toFixed(2)}</p>
                                 </div>
                                 <div class="p-4 bg-[#1a2138] text-center space-y-3">
-                                    <div class="bg-indigo-950 border border-indigo-500/30 text-indigo-300 py-1 px-2.5 rounded text-[10px] font-medium tracking-wide inline-block">⚡ Razorpay Style Secure UPI Link</div>
+                                    <div class="bg-indigo-950 border border-indigo-500/30 text-indigo-300 py-1 px-2.5 rounded text-[10px] font-medium tracking-wide inline-block">⚡ Secure UPI Payment</div>
                                     <div class="bg-white p-1.5 rounded-lg inline-block mx-auto border-4 border-[#33426b]"><img src="${SHOP_PAYMENT_QR}" alt="Scan to Pay" class="w-44 h-44 object-contain rounded"></div>
                                     <p class="text-[11px] text-slate-300 px-1">Scan using any UPI App & Pay exactly <span class="text-indigo-400 font-bold">₹${order.totalAmount.toFixed(2)}</span></p>
                                 </div>
@@ -219,7 +222,12 @@
             } catch (e) { alert("Error: " + e.message); }
         }
 
-        onSnapshot(collection(db, "products"), (snapshot) => { state.products = []; snapshot.forEach(doc => state.products.push({ id: doc.id, ...doc.data() })); render(); });
+        // HERE IS THE FIX: Added render() inside onSnapshot so it repaints the screen immediately!
+        onSnapshot(collection(db, "products"), (snapshot) => { 
+            state.products = []; 
+            snapshot.forEach(doc => state.products.push({ id: doc.id, ...doc.data() })); 
+            render(); 
+        });
     </script>
 </body>
 </html>

@@ -3,189 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FINACLE INTEGRATED CBS - ADVANCED TRANSACTION MODULE</title>
+    <title>FINACLE CORE BANKING SYSTEM - PRODUCTION LIVE</title>
     <style>
-        * { box-sizing: border-box; }
-        body {
-            font-family: 'Courier New', Courier, monospace;
-            background-color: #1a252f;
-            margin: 10px;
-            color: #000;
-            padding-bottom: 50px;
-        }
-        .system-container {
-            max-width: 750px;
-            margin: 20px auto;
-            background: #eef2f5;
-            border: 4px double #003366;
-            box-shadow: 0px 0px 20px rgba(0,0,0,0.6);
-        }
-        .system-header {
-            background: linear-gradient(180deg, #004080, #002244);
-            color: #ffffff;
-            padding: 8px 15px;
-            font-weight: bold;
-            font-size: 14px;
-            display: flex;
-            justify-content: space-between;
-        }
-        .menu-bar {
-            background-color: #d1dbe5;
-            padding: 5px 15px;
-            font-size: 12px;
-            font-weight: bold;
-            border-bottom: 1px solid #999;
-            color: #002244;
-        }
+        * { box-sizing: border-box; font-family: monospace; }
+        body { background-color: #1a252f; margin: 10px; color: #000; padding-bottom: 50px; }
+        .system-container { max-width: 700px; margin: 15px auto; background: #eef2f5; border: 4px double #003366; box-shadow: 0px 0px 15px rgba(0,0,0,0.5); }
+        .system-header { background: #004080; color: #ffffff; padding: 10px; font-weight: bold; font-size: 14px; display: flex; justify-content: space-between; }
+        .menu-bar { background-color: #d1dbe5; padding: 6px 15px; font-size: 12px; font-weight: bold; border-bottom: 1px solid #999; color: #002244; }
         .form-section { padding: 15px; }
-        .fieldset-box {
-            border: 1px solid #003366;
-            background-color: #fff;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-        .legend-title {
-            font-weight: bold;
-            color: #003366;
-            background: #eef2f5;
-            padding: 0 10px;
-        }
-        .row {
-            margin-bottom: 12px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .row label {
-            width: 220px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-        .row input, .row select {
-            padding: 6px;
-            width: 250px;
-            border: 1px solid #777;
-            background-color: #ffffff;
-            font-family: inherit;
-            font-weight: bold;
-        }
-        .readonly-input {
-            background-color: #e1e7ed !important;
-            color: #b30000 !important;
-        }
-        .fetch-btn {
-            background-color: #0056b3;
-            color: white;
-            border: 1px solid #004080;
-            padding: 8px 15px;
-            font-size: 13px;
-            cursor: pointer;
-            font-weight: bold;
-            font-family: inherit;
-        }
+        .fieldset-box { border: 1px solid #003366; background-color: #fff; padding: 15px; margin-bottom: 15px; }
+        .legend-title { font-weight: bold; color: #003366; background: #eef2f5; padding: 0 8px; }
+        .row { margin-bottom: 12px; display: flex; flex-wrap: wrap; align-items: center; }
+        .row label { width: 200px; font-weight: bold; font-size: 13px; }
+        .row input, .row select { padding: 6px; width: 240px; font-weight: bold; border: 1px solid #777; }
+        .row input:focus, .row select:focus { background-color: #ffffcc !important; outline: 2px solid #004080; }
+        .readonly-input { background-color: #e1e7ed !important; color: #b30000 !important; }
+        .fetch-btn { background-color: #0056b3; color: white; border: 1px solid #004080; padding: 8px 15px; font-size: 13px; cursor: pointer; font-weight: bold; }
         .fetch-btn:hover { background-color: #003366; }
-        
-        .denomination-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            background: white;
-        }
-        .denomination-table th, .denomination-table td {
-            border: 1px solid #003366;
-            padding: 6px;
-            text-align: center;
-            font-size: 14px;
-        }
+        .denomination-table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; }
+        .denomination-table th, .denomination-table td { border: 1px solid #003366; padding: 8px; text-align: center; font-size: 13px; }
         .denomination-table th { background-color: #004080; color: white; }
-        .denom-input {
-            width: 80px;
-            text-align: center;
-            padding: 6px;
-            font-weight: bold;
-            border: 2px solid #555;
-        }
-        .total-section {
-            margin-top: 15px;
-            text-align: right;
-            font-size: 18px;
-            font-weight: bold;
-            background: #002244;
-            color: #fff;
-            padding: 10px;
-        }
-        .btn-container {
-            padding: 15px;
-            text-align: center;
-            background-color: #d1dbe5;
-            border-top: 1px solid #999;
-        }
-        .btn {
-            background-color: #008040;
-            color: white;
-            border: 2px solid #004d26;
-            padding: 12px 30px;
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
-            font-family: inherit;
-        }
-        .btn:hover { background-color: #006633; }
-        
-        #success-toast {
-            display: none;
-            background-color: #d4edda;
-            color: #155724;
-            border: 2px solid #c3e6cb;
-            padding: 15px;
-            margin: 15px;
-            font-weight: bold;
-            text-align: center;
-            font-size: 14px;
-        }
-        #alert-toast {
-            display: none;
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 2px solid #f5c6cb;
-            padding: 15px;
-            margin: 15px;
-            font-weight: bold;
-            text-align: center;
-        }
-        .footer-status {
-            background-color: #002244;
-            color: #00ff00;
-            padding: 5px 15px;
-            font-size: 12px;
-        }
+        .denom-input { width: 80px; text-align: center; padding: 6px; font-weight: bold; border: 2px solid #555; }
+        .total-section { margin-top: 15px; text-align: right; font-size: 18px; font-weight: bold; background: #002244; color: #fff; padding: 10px; }
+        .btn-container { padding: 15px; text-align: center; background-color: #d1dbe5; border-top: 1px solid #999; }
+        .btn { color: white; padding: 12px 30px; font-size: 15px; font-weight: bold; cursor: pointer; border: 2px solid; }
+        #success-toast { display: none; background-color: #d4edda; color: #155724; border: 2px solid #c3e6cb; padding: 15px; margin: 15px; font-weight: bold; text-align: center; }
+        #alert-toast { display: none; background-color: #f8d7da; color: #721c24; border: 2px solid #f5c6cb; padding: 15px; margin: 15px; font-weight: bold; text-align: center; }
+        .footer-status { background-color: #002244; color: #00ff00; padding: 5px 15px; font-size: 12px; }
     </style>
 </head>
 <body>
 
 <div class="system-container">
     <div class="system-header">
-        <span>FINACLE CORE BANKING SYSTEM [PROD_SERVER_02]</span>
-        <span>SOL ID: 4129 | SYSTEM LIVE</span>
+        <span>FINACLE CORE BANKING ONLINE v3.0</span>
+        <span>SOL ID: 4129 | SECURE</span>
     </div>
     <div class="menu-bar">
-        MENU ID: CTMV | TRANSACTION TYPE: FLEXI-CASH MODULE
+        MENU ID: CTMV | EXT-INTERFACE: GITHUB_PAGES_PROD
     </div>
 
     <div class="form-section">
         <div class="fieldset-box">
-            <div class="legend-title">【 CUSTOMER & ACCOUNT WORKFLOW 】</div>
+            <div class="legend-title">【 CUSTOMER WORKFLOW 】</div>
+            <br>
             <div class="row">
                 <label>Account Number :</label>
                 <input type="number" id="accNum" placeholder="अकाउंट नंबर डालें">
             </div>
             <div class="row">
                 <label>Account Holder Name:</label>
-                <input type="text" id="accName" placeholder="यहाँ नाम डालें">
+                <input type="text" id="accName" placeholder="नाम दर्ज करें">
             </div>
-            <div class="row" style="margin: 15px 0;">
+            <div class="row" style="margin: 10px 0;">
                 <label>Server Action:</label>
-                <button type="button" class="fetch-btn" onclick="fetchServerBalance(); return false;">[F2] FETCH LIVE BALANCE (बैलेंस देखें)</button>
+                <button type="button" class="fetch-btn" id="btnFetch"> [F2] FETCH LIVE BALANCE </button>
             </div>
             <div class="row">
                 <label>Available Balance :</label>
@@ -193,7 +65,7 @@
             </div>
             <div class="row">
                 <label>Transaction Remark :</label>
-                <select id="txnRemark" onchange="updateTransactionTheme()">
+                <select id="txnRemark">
                     <option value="CASH DEPOSIT">CASH DEPOSIT (पैसे जमा - Plus होगा)</option>
                     <option value="AEPS CASH WITHDRAWAL">AEPS CASH WITHDRAWAL (आधार निकासी - Minus होगा)</option>
                     <option value="CASH WITHDRAWAL">CASH WITHDRAWAL - SLIP (निकासी - Minus होगा)</option>
@@ -203,7 +75,7 @@
 
         <div class="fieldset-box">
             <div class="legend-title">【 DENOMINATION VAULT 】</div>
-            <p style="font-size:12px; color:red; margin:0 0 10px 0;">* नोटों की संख्या लिखकर नीचे "SUBMIT" दबाएं, कुल रुपये अपने आप जुड़ जाएंगे।</p>
+            <br>
             <table class="denomination-table">
                 <thead>
                     <tr>
@@ -215,22 +87,22 @@
                 <tbody>
                     <tr>
                         <td><b>₹ 500</b></td>
-                        <td><input type="number" class="denom-input" id="n500" value="0" min="0"></td>
+                        <td><input type="number" class="denom-input note-field" id="n500" value="0" min="0"></td>
                         <td>₹ <span id="v500">0</span></td>
                     </tr>
                     <tr>
                         <td><b>₹ 200</b></td>
-                        <td><input type="number" class="denom-input" id="n200" value="0" min="0"></td>
+                        <td><input type="number" class="denom-input note-field" id="n200" value="0" min="0"></td>
                         <td>₹ <span id="v200">0</span></td>
                     </tr>
                     <tr>
                         <td><b>₹ 100</b></td>
-                        <td><input type="number" class="denom-input" id="n100" value="0" min="0"></td>
+                        <td><input type="number" class="denom-input note-field" id="n100" value="0" min="0"></td>
                         <td>₹ <span id="v100">0</span></td>
                     </tr>
                     <tr>
                         <td><b>₹ 50</b></td>
-                        <td><input type="number" class="denom-input" id="n50" value="0" min="0"></td>
+                        <td><input type="number" class="denom-input note-field" id="n50" value="0" min="0"></td>
                         <td>₹ <span id="v50">0</span></td>
                     </tr>
                 </tbody>
@@ -249,162 +121,159 @@
     </div>
 
     <div class="btn-container">
-        <button class="btn" id="submitBtn" onclick="submitTransaction()">[F10] SUBMIT TRANSACTION</button>
+        <button class="btn" id="submitBtn" style="background-color: #008040; border-color: #004d26;">[F10] SUBMIT TRANSACTION</button>
     </div>
 
     <div class="footer-status">
-        STATUS: ONLINE | TERMINAL: TERM_4129_A | SERVER: CONNECTED
+        STATUS: ONLINE | REPO: DEPLOYED | SECURITY: SSL_ENABLED
     </div>
 </div>
 
 <script>
-    // ग्लोबल बैलेंस सेव करने के लिए वेरिएबल
-    var globalServerBalance = -1; 
+    // कोड लोड होते ही सारे एलिमेंट्स को इवेंट-लिसनर से बांधना (GitHub Pages के लिए सबसे बेस्ट प्रैक्टिस)
+    window.onload = function() {
+        var globalServerBalance = -1;
 
-    // 1. बैलेंस फेच करने का बिल्कुल नया सॉलिड तरीका
-    function fetchServerBalance() {
-        var accNum = document.getElementById('accNum').value.trim();
-        var accName = document.getElementById('accName').value.trim();
-
-        if (accNum === "" || accName === "") {
-            alert("कृपया पहले ऊपर Account Number और Name दोनों टाइप करें!");
-            return false;
-        }
-
-        document.getElementById('currBal').value = "🔄 FETCHING...";
-
-        // रैंडम बैलेंस कैलकुलेशन लॉजिक (₹5000 से ₹2,00,000) - कम रकम का चांस ज्यादा
-        var randomAmt = 0;
-        var chance = Math.random(); 
-        if (chance < 0.65) {
-            randomAmt = Math.floor(Math.random() * (45000 - 5000 + 1)) + 5000; // 5k से 45k
-        } else if (chance < 0.90) {
-            randomAmt = Math.floor(Math.random() * (100000 - 45000 + 1)) + 45000; // 45k से 1 लाख
-        } else {
-            randomAmt = Math.floor(Math.random() * (200000 - 100000 + 1)) + 100000; // 1 लाख से 2 लाख
-        }
-
-        globalServerBalance = randomAmt;
+        var btnFetch = document.getElementById('btnFetch');
+        var btnSubmit = document.getElementById('submitBtn');
+        var txnRemark = document.getElementById('txnRemark');
         
-        // सीधे स्क्रीन पर वैल्यू सेट कर दो बिना किसी डिले के
-        document.getElementById('currBal').value = "₹ " + randomAmt.toLocaleString('en-IN') + ".00";
-        
-        // पुराने मैसेज छुपा दो
-        document.getElementById('success-toast').style.display = 'none';
-        document.getElementById('alert-toast').style.display = 'none';
-        
-        return false;
-    }
+        var noteFields = document.querySelectorAll('.note-field');
 
-    // 2. मैन्युअल/ऑटोमैटिक कैलकुलेशन के लिए फुल-प्रूफ फंक्शन
-    function forceCalc() {
-        var n500 = parseInt(document.getElementById('n500').value) || 0;
-        var n200 = parseInt(document.getElementById('n200').value) || 0;
-        var n100 = parseInt(document.getElementById('n100').value) || 0;
-        var n50 = parseInt(document.getElementById('n50').value) || 0;
+        // थीम अपडेट करने के लिए (जमा/निकासी के रंग बदलना)
+        txnRemark.addEventListener('change', function() {
+            if (this.value.includes("WITHDRAWAL")) {
+                btnSubmit.style.backgroundColor = "#cc0000";
+                btnSubmit.style.borderColor = "#990000";
+                btnSubmit.innerText = "[F10] DEBIT / WITHDRAW NOW";
+            } else {
+                btnSubmit.style.backgroundColor = "#008040";
+                btnSubmit.style.borderColor = "#004d26";
+                btnSubmit.innerText = "[F10] SUBMIT TRANSACTION";
+            }
+        });
 
-        var v500 = n500 * 500;
-        var v200 = n200 * 200;
-        var v100 = n100 * 100;
-        var v50 = n50 * 50;
+        // लाइव कैलकुलेशन - जैसे ही कीबोर्ड छुओगे, यह तुरंत चलेगा
+        function runLiveCalculation() {
+            var n500 = parseInt(document.getElementById('n500').value) || 0;
+            var n200 = parseInt(document.getElementById('n200').value) || 0;
+            var n100 = parseInt(document.getElementById('n100').value) || 0;
+            var n50 = parseInt(document.getElementById('n50').value) || 0;
 
-        document.getElementById('v500').innerText = v500;
-        document.getElementById('v200').innerText = v200;
-        document.getElementById('v100').innerText = v100;
-        document.getElementById('v50').innerText = v50;
+            var v500 = n500 * 500;
+            var v200 = n200 * 200;
+            var v100 = n100 * 100;
+            var v50 = n50 * 50;
 
-        var grandTotal = v500 + v200 + v100 + v50;
-        document.getElementById('totalTxnAmount').innerText = grandTotal;
-        
-        return grandTotal;
-    }
+            document.getElementById('v500').innerText = v500;
+            document.getElementById('v200').innerText = v200;
+            document.getElementById('v100').innerText = v100;
+            document.getElementById('v50').innerText = v50;
 
-    // Remark के चेंज होने पर बटन का रंग बदलना (लाल=निकासी, हरा=जमा)
-    function updateTransactionTheme() {
-        var type = document.getElementById('txnRemark').value;
-        var btn = document.getElementById('submitBtn');
-        if (type.includes("WITHDRAWAL")) {
-            btn.style.backgroundColor = "#cc0000"; 
-            btn.innerText = "[F10] DEBIT / WITHDRAW NOW";
-        } else {
-            btn.style.backgroundColor = "#008040"; 
-            btn.innerText = "[F10] SUBMIT / POST TRANSACTION";
-        }
-    }
-
-    // 3. फाइनल सबमिट बटन (यह खुद पहले कैलकुलेट करेगा, फिर प्लस या माइनस करेगा)
-    function submitTransaction() {
-        // सबसे पहले नोटों को जबरदस्ती कैलकुलेट करो
-        var finalTxnAmount = forceCalc();
-        
-        var nameInput = document.getElementById('accName').value.trim().toUpperCase();
-        var accInput = document.getElementById('accNum').value.trim();
-        var remarkType = document.getElementById('txnRemark').value;
-
-        var alertBox = document.getElementById('alert-toast');
-        var successBox = document.getElementById('success-toast');
-
-        alertBox.style.display = 'none';
-        successBox.style.display = 'none';
-
-        // सुरक्षा जांच (Validations)
-        if (accInput === "" || nameInput === "") {
-            alertBox.innerText = "त्रुटि: कृपया खाता संख्या और नाम दर्ज करें!";
-            alertBox.style.display = 'block';
-            return;
+            var grandTotal = v500 + v200 + v100 + v50;
+            document.getElementById('totalTxnAmount').innerText = grandTotal;
+            return grandTotal;
         }
 
-        if (globalServerBalance === -1) {
-            alertBox.innerText = "सुरक्षा त्रुटि: पहले नीले बटन पर क्लिक करके 'FETCH LIVE BALANCE' करें!";
-            alertBox.style.display = 'block';
-            return;
-        }
+        // हर नोट इनपुट बॉक्स पर इवेंट्स अटैच करना
+        noteFields.forEach(function(field) {
+            field.addEventListener('input', runLiveCalculation);
+            field.addEventListener('keyup', runLiveCalculation);
+            field.addEventListener('change', runLiveCalculation);
+        });
 
-        if (finalTxnAmount <= 0) {
-            alertBox.innerText = "त्रुटि: कृपया कम से कम किसी एक नोट की संख्या (Count) डालें!";
-            alertBox.style.display = 'block';
-            return;
-        }
+        // बैलेंस फेच बटन का लॉजिक
+        btnFetch.addEventListener('click', function() {
+            var accNum = document.getElementById('accNum').value.trim();
+            var accName = document.getElementById('accName').value.trim();
 
-        var newBalance = 0;
+            if (accNum === "" || accName === "") {
+                alert("कृपया पहले Account Number और Name दोनों टाइप करें!");
+                return;
+            }
 
-        // प्लस और माइनस का असली लॉजिक यहाँ है:
-        if (remarkType.includes("WITHDRAWAL")) {
-            // अगर AEPS या CASH WITHDRAWAL है तो माइनस (कम) होगा
-            if (finalTxnAmount > globalServerBalance) {
-                alertBox.innerText = `त्रुटि: खाते में पर्याप्त बैलेंस नहीं है! (खाते में: ₹${globalServerBalance.toLocaleString('en-IN')}, आप निकाल रहे हैं: ₹${finalTxnAmount.toLocaleString('en-IN')})`;
+            // रैंडम बैलेंस: 5k से 200k (कम रकम का 80% चांस)
+            var randomAmt = 0;
+            var chance = Math.random();
+            if (chance < 0.65) {
+                randomAmt = Math.floor(Math.random() * (45000 - 5000 + 1)) + 5000;
+            } else if (chance < 0.90) {
+                randomAmt = Math.floor(Math.random() * (100000 - 45000 + 1)) + 45000;
+            } else {
+                randomAmt = Math.floor(Math.random() * (200000 - 100000 + 1)) + 100000;
+            }
+
+            globalServerBalance = randomAmt;
+            document.getElementById('currBal').value = "₹ " + randomAmt.toLocaleString('en-IN') + ".00";
+            
+            document.getElementById('success-toast').style.display = 'none';
+            document.getElementById('alert-toast').style.display = 'none';
+        });
+
+        // फाइनल सबमिट बटन का लॉजिक
+        btnSubmit.addEventListener('click', function() {
+            var finalTxnAmount = runLiveCalculation();
+            var nameInput = document.getElementById('accName').value.trim().toUpperCase();
+            var accInput = document.getElementById('accNum').value.trim();
+            var remarkType = txnRemark.value;
+
+            var alertBox = document.getElementById('alert-toast');
+            var successBox = document.getElementById('success-toast');
+
+            alertBox.style.display = 'none';
+            successBox.style.display = 'none';
+
+            if (accInput === "" || nameInput === "") {
+                alertBox.innerText = "त्रुटि: कृपया खाता संख्या और नाम दर्ज करें!";
                 alertBox.style.display = 'block';
                 return;
             }
-            newBalance = globalServerBalance - finalTxnAmount; // माइनस हुआ
-        } else {
-            // अगर CASH DEPOSIT है तो प्लस (जुड़ेगा) होगा
-            newBalance = globalServerBalance + finalTxnAmount; // प्लस हुआ
-        }
 
-        // स्क्रीन पर परिणाम दिखाओ
-        var toastDetails = document.getElementById('toastDetails');
-        var actionWord = remarkType.includes("WITHDRAWAL") ? "Debited (निकाले गए)" : "Credited (जमा किए गए)";
-        
-        toastDetails.innerHTML = `
-            <b>Account Number:</b> ${accInput}<br>
-            <b>Account Holder:</b> ${nameInput}<br>
-            <b>Transaction:</b> ${remarkType}<br>
-            <b>Amount:</b> ₹${finalTxnAmount.toLocaleString('en-IN')}.00 ${actionWord}<br>
-            <hr style='border:1px dashed #ccc;'>
-            <b>New Available Balance:</b> ₹${newBalance.toLocaleString('en-IN')}.00
-        `;
-        successBox.style.display = 'block';
+            if (globalServerBalance === -1) {
+                alertBox.innerText = "सुरक्षा त्रुटि: पहले 'FETCH LIVE BALANCE' बटन दबाएं!";
+                alertBox.style.display = 'block';
+                return;
+            }
 
-        // ऊपर वाले बैलेंस बॉक्स को भी नया अपडेटेड बैलेंस दे दो
-        document.getElementById('currBal').value = "₹ " + newBalance.toLocaleString('en-IN') + ".00";
-        
-        // अगले ट्रांजैक्शन के लिए इसी बैलेंस को सेट कर दो
-        globalServerBalance = newBalance;
+            if (finalTxnAmount <= 0) {
+                alertBox.innerText = "त्रुटि: कृपया नोटों की संख्या दर्ज करें!";
+                alertBox.style.display = 'block';
+                return;
+            }
 
-        successBox.scrollIntoView({ behavior: 'smooth' });
-    </div>
+            var newBalance = 0;
+
+            if (remarkType.includes("WITHDRAWAL")) {
+                if (finalTxnAmount > globalServerBalance) {
+                    alertBox.innerText = "त्रुटि: खाते में पर्याप्त बैलेंस नहीं है!";
+                    alertBox.style.display = 'block';
+                    return;
+                }
+                newBalance = globalServerBalance - finalTxnAmount;
+            } else {
+                newBalance = globalServerBalance + finalTxnAmount;
+            }
+
+            var toastDetails = document.getElementById('toastDetails');
+            var actionWord = remarkType.includes("WITHDRAWAL") ? "Debited (निकाले गए)" : "Credited (जमा किए गए)";
+            
+            toastDetails.innerHTML = `
+                <b>Account Number:</b> ${accInput}<br>
+                <b>Account Holder:</b> ${nameInput}<br>
+                <b>Transaction:</b> ${remarkType}<br>
+                <b>Amount:</b> ₹${finalTxnAmount.toLocaleString('en-IN')}.00 ${actionWord}<br>
+                <hr style='border:1px dashed #ccc;'>
+                <b>New Available Balance:</b> ₹${newBalance.toLocaleString('en-IN')}.00
+            `;
+            successBox.style.display = 'block';
+
+            document.getElementById('currBal').value = "₹ " + newBalance.toLocaleString('en-IN') + ".00";
+            globalServerBalance = newBalance;
+            successBox.scrollIntoView({ behavior: 'smooth' });
+        });
+    };
 </script>
 
 </body>
-</html>
+    </html>
+                                

@@ -3,236 +3,246 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Namdev Ice Cream Corner & Sweets</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>CBS - Cash Deposit Module (Demo)</title>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f0f4f8;
+            margin: 20px;
+            color: #333;
+        }
+        .system-container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #0056b3;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.1);
+        }
+        .system-header {
+            background-color: #0056b3;
+            color: white;
+            padding: 10px;
+            font-weight: bold;
+            font-size: 18px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .form-section {
+            padding: 20px;
+        }
+        .row {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .row label {
+            width: 200px;
+            font-weight: bold;
+        }
+        .row input {
+            padding: 6px;
+            width: 250px;
+            border: 1px solid #999;
+            background-color: #fffffe;
+        }
+        .row input:focus {
+            background-color: #ffffcc; /* क्लिक करने पर बैंक सॉफ्टवेयर की तरह पीला बैकग्राउंड */
+            outline: none;
+        }
+        .denomination-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .denomination-table th, .denomination-table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+        .denomination-table th {
+            background-color: #e6f2ff;
+        }
+        .denom-input {
+            width: 80px;
+            text-align: center;
+            padding: 4px;
+        }
+        .total-section {
+            margin-top: 20px;
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+            background: #e6e6e6;
+            padding: 10px;
+            border-top: 2px solid #0056b3;
+        }
+        .btn-container {
+            padding: 15px;
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+        .btn {
+            background-color: #008040;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .btn:hover {
+            background-color: #006633;
+        }
+        #success-toast {
+            display: none;
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            margin: 15px;
+            font-weight: bold;
+            text-align: center;
+        }
+    </style>
 </head>
-<body class="bg-gray-50 text-gray-900 antialiased min-h-screen pb-24">
+<body>
 
-    <div id="app-root"></div>
+<div class="system-container">
+    <div class="system-header">
+        <span>CORE BANKING SYSTEM (V2026.2)</span>
+        <span>TXN CODE: 1001 (CASH DEP)</span>
+    </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, doc, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    <div class="form-section">
+        <!-- अकाउंट नंबर -->
+        <div class="row">
+            <label>Account Number:</label>
+            <input type="text" id="accNum" value="30456123987">
+        </div>
+        
+        <!-- नाम बदलने का ऑप्शन (अब यह ओपन है, तुम अपना नाम लिख सकते हो) -->
+        <div class="row">
+            <label>Account Holder Name:</label>
+            <input type="text" id="accName" placeholder="यहाँ अपना नाम टाइप करें...">
+        </div>
+        
+        <div class="row">
+            <label>Current Balance:</label>
+            <input type="text" id="currBal" value="₹ 0.00" readonly style="background:#e9ecef; color: blue; font-weight: bold;">
+        </div>
+        <div class="row">
+            <label>Transaction Remarks:</label>
+            <input type="text" value="BY CASH DEPOSIT">
+        </div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCiXRCabiRZK1J0Ots25gCB4qqc2HtugsU",
-            authDomain: "namdev-sweets-4c54f.firebaseapp.com",
-            databaseURL: "https://namdev-sweets-4c54f-default-rtdb.firebaseio.com",
-            projectId: "namdev-sweets-4c54f",
-            storageBucket: "namdev-sweets-4c54f.firebasestorage.app",
-            messagingSenderId: "939670079612",
-            appId: "1:939670079612:web:048c93b8e9b7677eaba1f9",
-            measurementId: "G-96TDVDMZTH"
-        };
+        <hr style="border: 0; border-top: 1px dashed #ccc; margin: 20px 0;">
+        <h4 style="margin: 0;">DENOMINATION DETAILS (नोटों का विवरण)</h4>
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const SHOP_PAYMENT_QR = "https://i.ibb.co/FLB6DJXc/RAKESH-TAILOR-1.jpg";
+        <table class="denomination-table">
+            <thead>
+                <tr>
+                    <th>Note Type (₹)</th>
+                    <th>Count (नोटों की संख्या)</th>
+                    <th>Value (कुल रुपये)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><b>500</b></td>
+                    <td><input type="number" class="denom-input" id="n500" value="0" min="0" oninput="calculateTotal()"></td>
+                    <td>₹ <span id="v500">0</span></td>
+                </tr>
+                <tr>
+                    <td><b>200</b></td>
+                    <td><input type="number" class="denom-input" id="n200" value="0" min="0" oninput="calculateTotal()"></td>
+                    <td>₹ <span id="v200">0</span></td>
+                </tr>
+                <tr>
+                    <td><b>100</b></td>
+                    <td><input type="number" class="denom-input" id="n100" value="0" min="0" oninput="calculateTotal()"></td>
+                    <td>₹ <span id="v100">0</span></td>
+                </tr>
+                <tr>
+                    <td><b>50</b></td>
+                    <td><input type="number" class="denom-input" id="n50" value="0" min="0" oninput="calculateTotal()"></td>
+                    <td>₹ <span id="v50">0</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-        let state = { activeCategory: "Ice Cream", cart: {}, customerName: "", customerPhone: "", activeOrderId: null, products: [] };
+    <div class="total-section">
+        TOTAL CASH AMOUNT: ₹ <span id="totalTxnAmount">0</span>.00
+    </div>
 
-        function render() {
-            const root = document.getElementById("app-root");
-            const cartItemsCount = Object.values(state.cart).reduce((a, b) => a + b, 0);
-            const totalPrice = calculateTotal();
+    <div id="success-toast">
+        ✔ TRANSACTION SUCCESSFUL!<br>
+        <span id="toastDetails"></span>
+    </div>
 
-            // Filter products matching current active category
-            const currentProducts = state.products.filter(p => p.category === state.activeCategory);
+    <div class="btn-container">
+        <button class="btn" onclick="submitTransaction()">[F10] SUBMIT TRANSACTION</button>
+    </div>
+</div>
 
-            root.innerHTML = `
-                <header class="bg-indigo-600 text-white px-4 py-3 shadow-sm sticky top-0 z-40">
-                    <h1 class="text-lg font-black tracking-tight">Namdev Ice Cream & Sweets</h1>
-                    <p class="text-[10px] text-indigo-200">Main Market, Ladriya</p>
-                </header>
+<script>
+    // लाइव नोट कैलकुलेशन
+    function calculateTotal() {
+        const n500 = parseInt(document.getElementById('n500').value) || 0;
+        const n200 = parseInt(document.getElementById('n200').value) || 0;
+        const n100 = parseInt(document.getElementById('n100').value) || 0;
+        const n50 = parseInt(document.getElementById('n50').value) || 0;
 
-                <main class="max-w-md mx-auto p-3 space-y-4">
-                    <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm space-y-2">
-                        <span class="text-[10px] uppercase font-bold tracking-wider text-gray-400 block">Customer Info (For Invoice)</span>
-                        <div class="grid grid-cols-2 gap-2">
-                            <input type="text" id="c-name" value="${state.customerName}" placeholder="Your Name" class="p-2 text-sm border border-gray-200 rounded outline-none focus:border-indigo-500">
-                            <input type="tel" id="c-phone" value="${state.customerPhone}" placeholder="Mobile No." class="p-2 text-sm border border-gray-200 rounded outline-none focus:border-indigo-500">
-                        </div>
-                    </div>
+        const v500 = n500 * 500;
+        const v200 = n200 * 200;
+        const v100 = n100 * 100;
+        const v50 = n50 * 50;
 
-                    <div class="flex gap-2 border-b border-gray-200 pb-1 overflow-x-auto">
-                        ${["Ice Cream", "Sweets", "Cakes", "Hot Snacks"].map(cat => `
-                            <button class="cat-pill px-3 py-1.5 text-xs font-bold whitespace-nowrap rounded-full transition ${state.activeCategory === cat ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600'}" data-cat="${cat}">${cat}</button>
-                        `).join('')}
-                    </div>
+        document.getElementById('v500').innerText = v500;
+        document.getElementById('v200').innerText = v200;
+        document.getElementById('v100').innerText = v100;
+        document.getElementById('v50').innerText = v50;
 
-                    <div class="space-y-2">
-                        ${currentProducts.length === 0 ? 
-                            `<p class="text-center text-xs text-gray-400 py-6">Is category me abhi koi maal live nahi hai.</p>` :
-                            currentProducts.map(product => {
-                                const qty = state.cart[product.id] || 0;
-                                return `
-                                    <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex justify-between items-center">
-                                        <div>
-                                            <h4 class="font-bold text-gray-800 text-sm">${product.name}</h4>
-                                            <p class="text-xs font-extrabold text-indigo-600 mt-0.5">₹${product.price}</p>
-                                        </div>
-                                        ${qty > 0 ? `
-                                            <div class="flex items-center gap-2 bg-indigo-50 rounded-lg p-1">
-                                                <button class="qty-change-btn w-7 h-7 bg-indigo-600 text-white rounded font-bold" data-id="${product.id}" data-delta="-1">-</button>
-                                                <span class="text-xs font-bold px-1 text-center">${qty}</span>
-                                                <button class="qty-change-btn w-7 h-7 bg-indigo-600 text-white rounded font-bold" data-id="${product.id}" data-delta="1">+</button>
-                                            </div>
-                                        ` : `
-                                            <button class="add-to-cart-btn bg-gray-900 text-white text-xs font-bold px-3 py-2 rounded-lg" data-id="${product.id}">Add</button>
-                                        `}
-                                    </div>
-                                `;
-                            }).join('')
-                        }
-                    </div>
+        const total = v500 + v200 + v100 + v50;
+        document.getElementById('totalTxnAmount').innerText = total;
+        
+        return total;
+    }
 
-                    ${cartItemsCount > 0 ? `
-                        <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 z-30 max-w-md mx-auto shadow-md">
-                            <div class="flex justify-between items-center gap-3">
-                                <div>
-                                    <p class="text-[10px] text-gray-400 font-bold uppercase">${cartItemsCount} Items</p>
-                                    <p class="text-base font-black text-gray-800">Total: ₹${totalPrice}</p>
-                                </div>
-                                <button id="submit-checkout-btn" class="bg-indigo-600 text-white font-bold text-xs uppercase py-3 px-5 rounded-xl flex-1 text-center shadow-sm">Pay & Get Token</button>
-                            </div>
-                        </div>
-                    ` : ''}
-                </main>
-                <div id="modal-target-layer"></div>
-            `;
-            bindEvents();
-            syncLiveOrderOverlay();
+    // सबमिट करने पर एक्शन
+    function submitTransaction() {
+        const totalAmount = calculateTotal();
+        let name = document.getElementById('accName').value.trim();
+        
+        // अगर नाम खाली है तो अलर्ट आएगा
+        if (name === "") {
+            alert("कृपया Account Holder Name दर्ज करें!");
+            return;
         }
 
-        function bindEvents() {
-            const nameIn = document.getElementById("c-name");
-            if (nameIn) nameIn.oninput = (e) => state.customerName = e.target.value;
-            const phoneIn = document.getElementById("c-phone");
-            if (phoneIn) phoneIn.oninput = (e) => state.customerPhone = e.target.value;
-
-            document.querySelectorAll(".cat-pill").forEach(pill => {
-                pill.onclick = () => { state.activeCategory = pill.getAttribute("data-cat"); render(); };
-            });
-
-            document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
-                btn.onclick = () => { const id = btn.getAttribute("data-id"); state.cart[id] = 1; render(); };
-            });
-
-            document.querySelectorAll(".qty-change-btn").forEach(btn => {
-                btn.onclick = () => {
-                    const id = btn.getAttribute("data-id");
-                    const delta = parseInt(btn.getAttribute("data-delta"));
-                    const next = (state.cart[id] || 0) + delta;
-                    if (next <= 0) delete state.cart[id];
-                    else state.cart[id] = next;
-                    render();
-                };
-            });
-
-            const submitBtn = document.getElementById("submit-checkout-btn");
-            if (submitBtn) submitBtn.onclick = () => triggerOrderAndCheckout();
+        if (totalAmount <= 0) {
+            alert("कृपया कम से कम एक नोट की संख्या दर्ज करें!");
+            return;
         }
 
-        function syncLiveOrderOverlay() {
-            const container = document.getElementById("modal-target-layer");
-            if (!container || !state.activeOrderId) return;
+        // नाम को कैपिटल लेटर में दिखाने के लिए
+        name = name.toUpperCase();
 
-            onSnapshot(doc(db, "orders", state.activeOrderId), (snapshot) => {
-                if (!snapshot.exists()) { container.innerHTML = ""; state.activeOrderId = null; return; }
-                const order = snapshot.data();
-                let modalHtml = "";
+        const toast = document.getElementById('success-toast');
+        const toastDetails = document.getElementById('toastDetails');
+        
+        // सक्सेस मैसेज में डायनामिक नाम दिखेगा
+        toastDetails.innerHTML = `Amount ₹${totalAmount.toLocaleString('en-IN')}.00 Credited to ${name}'s Account.<br>SMS Notification Sent to Registered Mobile.`;
+        toast.style.display = 'block';
 
-                if (order.paymentStatus === "PENDING") {
-                    modalHtml = `
-                        <div class="fixed inset-0 bg-black/70 flex items-center justify-center p-3 z-50 font-sans">
-                            <div class="bg-[#1a2138] text-white rounded-xl shadow-2xl w-full max-w-[340px] overflow-hidden border border-slate-800">
-                                <div class="bg-[#232c4c] p-3 flex items-center justify-between border-b border-slate-800">
-                                    <div>
-                                        <h4 class="font-bold text-xs">Namdev Ice Cream Corner</h4>
-                                        <p class="text-[9px] text-gray-400">Payment Gateway</p>
-                                    </div>
-                                    <p class="text-xs font-black text-emerald-400">₹${order.totalAmount.toFixed(2)}</p>
-                                </div>
-                                <div class="p-4 bg-[#1a2138] text-center space-y-3">
-                                    <div class="bg-indigo-950 border border-indigo-500/30 text-indigo-300 py-1 px-2.5 rounded text-[10px] font-medium tracking-wide inline-block">⚡ Secure UPI Payment</div>
-                                    <div class="bg-white p-1.5 rounded-lg inline-block mx-auto border-4 border-[#33426b]"><img src="${SHOP_PAYMENT_QR}" alt="Scan to Pay" class="w-44 h-44 object-contain rounded"></div>
-                                    <p class="text-[11px] text-slate-300 px-1">Scan using any UPI App & Pay exactly <span class="text-indigo-400 font-bold">₹${order.totalAmount.toFixed(2)}</span></p>
-                                </div>
-                                <div class="bg-[#232c4c] p-3 flex flex-col gap-1.5 border-t border-slate-800">
-                                    <button id="success-paid-btn" class="w-full bg-[#2bb343] text-white font-bold text-xs uppercase py-2.5 rounded tracking-wider shadow-sm">I Have Paid Successfully</button>
-                                    <button id="cancel-pay-btn" class="w-full bg-transparent text-slate-400 text-[10px] font-medium py-1">Cancel Order</button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                } else if (order.paymentStatus === "SUCCESS") {
-                    modalHtml = `
-                        <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-3 z-50">
-                            <div class="bg-white rounded-2xl p-5 w-full max-w-xs text-center shadow-xl space-y-3.5 border border-gray-100">
-                                <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-xl font-black">✓</div>
-                                <div>
-                                    <p class="text-[10px] font-black uppercase tracking-widest text-emerald-600">Digital Invoice / Token Receipt</p>
-                                    <h3 class="text-gray-900 font-bold text-base mt-0.5">Namdev Ice Cream Corner</h3>
-                                </div>
-                                <div class="bg-gray-50 border border-dashed border-gray-200 rounded-xl py-3 my-1">
-                                    <span class="block text-[10px] font-bold text-gray-400 uppercase">Order Queue Number</span>
-                                    <span class="text-3xl font-black text-gray-800 block mt-0.5">TOKEN #${order.tokenNumber || '...'}</span>
-                                </div>
-                                <div class="text-left text-xs text-gray-600 bg-gray-50 p-2.5 rounded space-y-1 font-medium">
-                                    <div><b>Items:</b></div>
-                                    ${order.items.map(i => `<div class="flex justify-between"><span>${i.name} x${i.quantity}</span><span>₹${i.price * i.quantity}</span></div>`).join('')}
-                                    <div class="border-t border-gray-200 pt-1 mt-1 font-bold flex justify-between text-gray-800"><span>Total Paid</span><span>₹${order.totalAmount}</span></div>
-                                </div>
-                                <button id="invoice-done-btn" class="w-full bg-gray-900 text-white font-bold text-xs uppercase py-2.5 rounded-xl">Close / Clear Screen</button>
-                            </div>
-                        </div>
-                    `;
-                }
+        // करंट बैलेंस को अपडेट करना
+        document.getElementById('currBal').value = "₹ " + totalAmount.toLocaleString('en-IN') + ".00";
 
-                container.innerHTML = modalHtml;
+        toast.scrollIntoView({ behavior: 'smooth' });
+    </div>
+</script>
 
-                const pBtn = document.getElementById("success-paid-btn");
-                if (pBtn) pBtn.onclick = () => {
-                    container.innerHTML = `
-                        <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-3 z-50">
-                            <div class="bg-white rounded-xl p-5 w-full max-w-xs text-center shadow-lg space-y-3">
-                                <div class="w-9 h-9 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-                                <h4 class="font-bold text-gray-800 text-sm">Verifying UPI Status...</h4>
-                                <p class="text-xs text-amber-600 font-bold bg-amber-50 py-1 px-2 rounded">⏳ Awaiting Counter Approval</p>
-                                <p class="text-[10px] text-gray-400">Counter se order verify hote hi aapka Token aur Invoice screen par aa jayega.</p>
-                            </div>
-                        </div>
-                    `;
-                };
-
-                const cBtn = document.getElementById("cancel-pay-btn");
-                if (cBtn) cBtn.onclick = async () => { if (confirm("Cancel order?")) { await deleteDoc(doc(db, "orders", state.activeOrderId)); state.activeOrderId = null; render(); } };
-
-                const dBtn = document.getElementById("invoice-done-btn");
-                if (dBtn) dBtn.onclick = () => { state.cart = {}; state.activeOrderId = null; render(); };
-            });
-        }
-
-        function calculateTotal() { return Object.entries(state.cart).reduce((sum, [id, qty]) => { const prod = state.products.find(p => p.id === id); return sum + (prod ? prod.price * qty : 0); }, 0); }
-
-        async function triggerOrderAndCheckout() {
-            if (!state.customerName.trim() || !state.customerPhone.trim()) { alert("Please enter Name and Mobile Number."); return; }
-            const amt = calculateTotal(); if (amt <= 0) return;
-            const structuredItems = Object.entries(state.cart).map(([id, qty]) => { const prod = state.products.find(p => p.id === id); return { id, name: prod.name, price: prod.price, quantity: qty }; });
-            try {
-                const ref = await addDoc(collection(db, "orders"), { customerName: state.customerName.trim(), customerPhone: state.customerPhone.trim(), items: structuredItems, totalAmount: amt, paymentStatus: "PENDING", deliveryStatus: "PENDING", createdAt: new Date().toISOString() });
-                state.activeOrderId = ref.id; render();
-            } catch (e) { alert("Error: " + e.message); }
-        }
-
-        // Live real-time stream listener for products
-        onSnapshot(collection(db, "products"), (snapshot) => { 
-            state.products = []; 
-            snapshot.forEach(doc => {
-                state.products.push({ id: doc.id, ...doc.data() }); 
-            }); 
-            render(); 
-        });
-    </script>
 </body>
-</html>
+    </html>
+                

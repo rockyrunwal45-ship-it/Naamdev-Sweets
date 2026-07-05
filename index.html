@@ -16,9 +16,7 @@
       font-weight:bold;
     }
 
-    .container {
-      padding:15px;
-    }
+    .container { padding:15px; }
 
     .grid {
       display:grid;
@@ -32,10 +30,6 @@
       padding:10px;
       text-align:center;
       box-shadow:0 2px 6px rgba(0,0,0,0.2);
-    }
-
-    .item h4 {
-      margin:5px 0;
     }
 
     .btn {
@@ -72,15 +66,16 @@
     }
   </style></head><body><header>🍬 NAAMDEV SWEETS</header><div class="container"><div class="grid" id="menu"></div><div class="cart-box">
   <h3>🛒 Cart</h3>
-  <div id="cart"></div>
-  <h3>Total: ₹<span id="total">0</span></h3>
+  <div id="cartItems"></div>
+  <h3>Total: ₹<span id="totalPrice">0</span></h3>
 </div><div class="cart-box">
   <h3>📋 Details</h3>
-  <input id="name" placeholder="Name">
-  <input id="phone" placeholder="Phone">
-  <input id="address" placeholder="Address"><button class="btn pay-btn" onclick="payNow()">Pay Now</button>
+  <input id="custName" placeholder="Name">
+  <input id="custPhone" placeholder="Phone">
+  <input id="custAddress" placeholder="Address"><button class="btn pay-btn" onclick="payNow()">Pay Now</button>
 
 </div></div><script>
+// Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBMpFfXUhIIRHHNTk8GasBxdPDUwWcP3KI",
   authDomain: "naamdev-sweets.firebaseapp.com",
@@ -90,6 +85,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+// Products
 let products = [
   {name:"Milk Cake", price:350},
   {name:"Kalakand", price:350},
@@ -108,39 +104,45 @@ let cart = [];
 let total = 0;
 
 // Render menu
-let html="";
+let menuHTML="";
 products.forEach((p,i)=>{
-  html += `
+  menuHTML += `
   <div class="item">
     <h4>${p.name}</h4>
     <p>₹${p.price}</p>
     <button class="btn" onclick="addToCart(${i})">Add</button>
   </div>`;
 });
-menu.innerHTML = html;
+document.getElementById("menu").innerHTML = menuHTML;
 
-// Add to cart
+// Add to cart FIXED
 function addToCart(i){
   cart.push(products[i]);
   total += products[i].price;
   updateCart();
 }
 
-// Update cart
+// Update cart FIXED
 function updateCart(){
   let h="";
-  cart.forEach(i=>{
-    h += i.name + " ₹" + i.price + "<br>";
+  cart.forEach(item=>{
+    h += item.name + " - ₹" + item.price + "<br>";
   });
-  cart.innerHTML = h;
-  total.innerText = total;
+
+  document.getElementById("cartItems").innerHTML = h;
+  document.getElementById("totalPrice").innerText = total;
 }
 
 // Payment
 function payNow(){
 
   if(total==0){ alert("Cart empty"); return; }
-  if(!name.value || !phone.value || !address.value){
+
+  let name = document.getElementById("custName").value;
+  let phone = document.getElementById("custPhone").value;
+  let address = document.getElementById("custAddress").value;
+
+  if(!name || !phone || !address){
     alert("Fill all details"); return;
   }
 
@@ -148,23 +150,21 @@ function payNow(){
     key: "rzp_test_T9dipl8p8O50UO",
     amount: total * 100,
     currency: "INR",
-    name: "Naamdev Sweets",
+    name: "Naamdev Sweets 🎂",
 
     handler: async function (res){
 
       await db.collection("orders").add({
-        name:name.value,
-        phone:phone.value,
-        address:address.value,
-        cart:cart,
-        total:total,
-        paymentId:res.razorpay_payment_id,
+        name, phone, address,
+        cart, total,
+        paymentId: res.razorpay_payment_id,
         status:"Paid",
         time:new Date().toLocaleString()
       });
 
       alert("✅ Order Done!");
-      cart=[]; total=0; updateCart();
+      cart=[]; total=0;
+      updateCart();
     }
   };
 

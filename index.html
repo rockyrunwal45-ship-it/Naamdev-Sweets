@@ -2,58 +2,76 @@
 <head>
   <title>Naamdev Sweets</title>  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>  <style>
     body {
-      font-family: Arial;
       margin:0;
-      background: linear-gradient(135deg,#ff9a9e,#fad0c4);
+      font-family: 'Segoe UI';
+      background: linear-gradient(135deg,#ff9966,#ff5e62);
+      color:#333;
     }
 
     header {
-      background:#ff6600;
-      color:#fff;
-      padding:15px;
       text-align:center;
-      font-size:22px;
+      padding:15px;
+      font-size:24px;
+      color:#fff;
       font-weight:bold;
     }
 
-    .container { padding:15px; }
+    .container {
+      padding:10px;
+    }
 
     .grid {
       display:grid;
-      grid-template-columns: repeat(auto-fit,minmax(150px,1fr));
-      gap:10px;
+      grid-template-columns: repeat(auto-fit,minmax(160px,1fr));
+      gap:12px;
     }
 
     .item {
-      background:#fff;
-      border-radius:10px;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      border-radius:15px;
       padding:10px;
       text-align:center;
-      box-shadow:0 2px 6px rgba(0,0,0,0.2);
+      color:#fff;
+      box-shadow:0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .item img {
+      width:100%;
+      height:100px;
+      border-radius:10px;
+      object-fit:cover;
     }
 
     .btn {
-      background:#ff6600;
-      color:#fff;
+      background:#fff;
+      color:#ff5e62;
       border:none;
       padding:6px 10px;
-      border-radius:5px;
+      border-radius:20px;
+      margin-top:5px;
       cursor:pointer;
     }
 
     .cart-box {
-      background:#fff;
       margin-top:15px;
+      background:#fff;
+      border-radius:15px;
       padding:10px;
-      border-radius:10px;
-      box-shadow:0 2px 6px rgba(0,0,0,0.2);
+      box-shadow:0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .cart-item {
+      display:flex;
+      justify-content:space-between;
+      margin-bottom:5px;
     }
 
     input {
       width:100%;
       padding:8px;
       margin-top:8px;
-      border-radius:5px;
+      border-radius:8px;
       border:1px solid #ccc;
     }
 
@@ -61,7 +79,10 @@
       width:100%;
       margin-top:10px;
       background:#28a745;
+      color:#fff;
       padding:10px;
+      border:none;
+      border-radius:10px;
       font-size:16px;
     }
   </style></head><body><header>🍬 NAAMDEV SWEETS</header><div class="container"><div class="grid" id="menu"></div><div class="cart-box">
@@ -72,7 +93,7 @@
   <h3>📋 Details</h3>
   <input id="custName" placeholder="Name">
   <input id="custPhone" placeholder="Phone">
-  <input id="custAddress" placeholder="Address"><button class="btn pay-btn" onclick="payNow()">Pay Now</button>
+  <input id="custAddress" placeholder="Address"><button class="pay-btn" onclick="payNow()">Pay Now</button>
 
 </div></div><script>
 // Firebase
@@ -85,48 +106,68 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// Products
+// Products with images
 let products = [
-  {name:"Milk Cake", price:350},
-  {name:"Kalakand", price:350},
-  {name:"Mawa Chakki", price:250},
-  {name:"Doodh Peda", price:250},
-  {name:"Barfi", price:250},
-  {name:"Rasgulla", price:180},
-  {name:"Laddu", price:160},
-  {name:"Gulab Jamun", price:140},
-  {name:"Samosa", price:20},
-  {name:"Kachori", price:25},
-  {name:"Mirchi Bada", price:25}
+  {name:"Milk Cake", price:350, img:"https://source.unsplash.com/200x200/?sweet"},
+  {name:"Kalakand", price:350, img:"https://source.unsplash.com/200x200/?indian-sweets"},
+  {name:"Barfi", price:250, img:"https://source.unsplash.com/200x200/?barfi"},
+  {name:"Rasgulla", price:180, img:"https://source.unsplash.com/200x200/?rasgulla"},
+  {name:"Laddu", price:160, img:"https://source.unsplash.com/200x200/?laddu"},
+  {name:"Gulab Jamun", price:140, img:"https://source.unsplash.com/200x200/?gulabjamun"},
+  {name:"Samosa", price:20, img:"https://source.unsplash.com/200x200/?samosa"},
+  {name:"Kachori", price:25, img:"https://source.unsplash.com/200x200/?kachori"}
 ];
 
 let cart = [];
-let total = 0;
 
 // Render menu
-let menuHTML="";
+let html="";
 products.forEach((p,i)=>{
-  menuHTML += `
+  html += `
   <div class="item">
+    <img src="${p.img}">
     <h4>${p.name}</h4>
     <p>₹${p.price}</p>
     <button class="btn" onclick="addToCart(${i})">Add</button>
   </div>`;
 });
-document.getElementById("menu").innerHTML = menuHTML;
+menu.innerHTML = html;
 
-// Add to cart FIXED
+// Add to cart
 function addToCart(i){
-  cart.push(products[i]);
-  total += products[i].price;
+  let item = products[i];
+  let found = cart.find(c => c.name === item.name);
+
+  if(found){
+    found.qty++;
+  } else {
+    cart.push({...item, qty:1});
+  }
+
   updateCart();
 }
 
-// Update cart FIXED
+// Remove item
+function removeItem(name){
+  cart = cart.filter(i => i.name !== name);
+  updateCart();
+}
+
+// Update cart
 function updateCart(){
   let h="";
-  cart.forEach(item=>{
-    h += item.name + " - ₹" + item.price + "<br>";
+  let total=0;
+
+  cart.forEach(i=>{
+    total += i.price * i.qty;
+    h += `
+    <div class="cart-item">
+      ${i.name} x${i.qty}
+      <div>
+        ₹${i.price*i.qty}
+        <button onclick="removeItem('${i.name}')">❌</button>
+      </div>
+    </div>`;
   });
 
   document.getElementById("cartItems").innerHTML = h;
@@ -136,11 +177,14 @@ function updateCart(){
 // Payment
 function payNow(){
 
+  let total = 0;
+  cart.forEach(i=> total += i.price*i.qty);
+
   if(total==0){ alert("Cart empty"); return; }
 
-  let name = document.getElementById("custName").value;
-  let phone = document.getElementById("custPhone").value;
-  let address = document.getElementById("custAddress").value;
+  let name = custName.value;
+  let phone = custPhone.value;
+  let address = custAddress.value;
 
   if(!name || !phone || !address){
     alert("Fill all details"); return;
@@ -150,7 +194,7 @@ function payNow(){
     key: "rzp_test_T9dipl8p8O50UO",
     amount: total * 100,
     currency: "INR",
-    name: "Naamdev Sweets 🎂",
+    name: "Naamdev Sweets",
 
     handler: async function (res){
 
@@ -162,8 +206,8 @@ function payNow(){
         time:new Date().toLocaleString()
       });
 
-      alert("✅ Order Done!");
-      cart=[]; total=0;
+      alert("✅ Order Success!");
+      cart=[];
       updateCart();
     }
   };

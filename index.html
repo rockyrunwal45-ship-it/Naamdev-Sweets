@@ -1,9 +1,10 @@
 <!DOCTYPE html><html>
 <head>
   <title>Naamdev Sweets</title>  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>  <style>
-    body { font-family: Arial; padding:20px; }
-    .item { border:1px solid #ccc; padding:10px; margin:10px; }
-    button { padding:6px 10px; }
+    body { font-family: Arial; padding:20px; background:#f9f9f9; }
+    .item { border:1px solid #ddd; padding:10px; margin:10px; border-radius:8px; background:#fff; }
+    button { padding:8px 12px; border:none; background:#ff6600; color:#fff; border-radius:5px; }
+    input { padding:8px; width:90%; }
   </style></head><body><h2>🍬 NAAMDEV SWEETS</h2><div id="menu"></div><h3>🛒 Cart</h3>
 <div id="cart"></div>
 <h3>Total: ₹<span id="total">0</span></h3><h3>📋 Details</h3>
@@ -38,6 +39,7 @@ let products = [
 let cart = [];
 let total = 0;
 
+// Load menu
 let menuHTML = "";
 products.forEach((p,i)=>{
   menuHTML += `<div class="item">
@@ -45,24 +47,37 @@ products.forEach((p,i)=>{
     <button onclick="addToCart(${i})">Add</button>
   </div>`;
 });
-document.getElementById("menu").innerHTML = menuHTML;
+menu.innerHTML = menuHTML;
 
+// Add item
 function addToCart(i){
   cart.push(products[i]);
   total += products[i].price;
   updateCart();
 }
 
+// Update cart
 function updateCart(){
   let html="";
   cart.forEach(i=>{
     html += i.name + " ₹" + i.price + "<br>";
   });
-  document.getElementById("cart").innerHTML = html;
-  document.getElementById("total").innerText = total;
+  cart.innerHTML = html;
+  total.innerText = total;
 }
 
+// Payment
 function payNow(){
+
+  if(total == 0){
+    alert("Cart empty!");
+    return;
+  }
+
+  if(!name.value || !phone.value || !address.value){
+    alert("Fill all details!");
+    return;
+  }
 
   let options = {
     key: "rzp_test_T9dipl8p8O50UO",
@@ -79,17 +94,22 @@ function payNow(){
         cart: cart,
         total: total,
         paymentId: response.razorpay_payment_id,
-        status: "Pending",
+        status: "Paid",
         time: new Date().toLocaleString()
       };
 
       await db.collection("orders").add(order);
 
-      alert("✅ Order Placed!");
+      alert("✅ Payment Successful & Order Placed!");
+
+      cart = [];
+      total = 0;
+      updateCart();
     }
   };
 
-  new Razorpay(options).open();
+  let rzp = new Razorpay(options);
+  rzp.open();
 }
 </script></body>
 </html>

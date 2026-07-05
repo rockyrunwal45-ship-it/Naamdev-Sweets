@@ -1,17 +1,82 @@
 <!DOCTYPE html><html>
 <head>
-  <title>Admin Panel</title>  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>  <style>
-    body { font-family: Arial; padding:20px; background:#f5f5f5; }
-    .card { border:1px solid #ddd; padding:10px; margin:10px; border-radius:8px; background:#fff; }
-    button { margin:5px; padding:5px 10px; }
-  </style></head><body><h2>🔐 Admin Login</h2><div id="loginBox">
-  <input id="id" placeholder="ID"><br><br>
-  <input id="pass" placeholder="Password" type="password"><br><br>
+  <title>Admin - Naamdev Sweets</title>  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>  <style>
+    body {
+      margin:0;
+      font-family:Arial;
+      background:#f4f4f4;
+    }
+
+    header {
+      background:#ff6600;
+      color:#fff;
+      padding:15px;
+      text-align:center;
+      font-size:20px;
+    }
+
+    .login-box {
+      max-width:300px;
+      margin:80px auto;
+      background:#fff;
+      padding:20px;
+      border-radius:10px;
+      box-shadow:0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    input {
+      width:100%;
+      padding:10px;
+      margin-top:10px;
+    }
+
+    button {
+      width:100%;
+      padding:10px;
+      margin-top:10px;
+      background:#ff6600;
+      color:#fff;
+      border:none;
+      cursor:pointer;
+    }
+
+    .panel {
+      display:none;
+      padding:10px;
+    }
+
+    .order {
+      background:#fff;
+      margin-bottom:10px;
+      padding:10px;
+      border-radius:10px;
+      box-shadow:0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .status {
+      margin-top:5px;
+    }
+
+    .btn {
+      margin-top:5px;
+      padding:5px;
+      border:none;
+      cursor:pointer;
+      border-radius:5px;
+    }
+
+    .accept { background:#28a745; color:#fff; }
+    .reject { background:#dc3545; color:#fff; }
+  </style></head><body><header>🔥 ADMIN PANEL</header><div class="login-box" id="loginBox">
+  <h3>Login</h3>
+  <input id="user" placeholder="ID">
+  <input id="pass" type="password" placeholder="Password">
   <button onclick="login()">Login</button>
-</div><div id="panel" style="display:none;">
-  <h2>📦 Orders</h2>
+</div><div class="panel" id="panel">
+  <h3>📦 Orders</h3>
   <div id="orders"></div>
 </div><script>
+// Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBMpFfXUhIIRHHNTk8GasBxdPDUwWcP3KI",
   authDomain: "naamdev-sweets.firebaseapp.com",
@@ -21,50 +86,61 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+// LOGIN
 function login(){
-  if(id.value=="894926" && pass.value=="Rakesh"){
-    loginBox.style.display="none";
-    panel.style.display="block";
+  if(user.value=="894926" && pass.value=="Rakesh"){
+    document.getElementById("loginBox").style.display="none";
+    document.getElementById("panel").style.display="block";
     loadOrders();
   } else {
     alert("Wrong login");
   }
 }
 
+// LOAD ORDERS (REALTIME FIX)
 function loadOrders(){
 
   db.collection("orders").orderBy("time","desc")
-  .onSnapshot(snapshot => {
+  .onSnapshot(snapshot=>{
 
     let html="";
 
     snapshot.forEach(doc=>{
       let o = doc.data();
 
+      let items="";
+      o.cart.forEach(i=>{
+        items += i.name + " x" + i.qty + "<br>";
+      });
+
       html += `
-      <div class="card">
-        <b>${o.name}</b><br>
-        📞 ${o.phone}<br>
-        📍 ${o.address}<br>
-        💰 ₹${o.total}<br>
-        🧾 ${o.paymentId || "N/A"}<br>
-        📦 Status: ${o.status}<br><br>
+      <div class="order">
+        <b>${o.name}</b> (${o.phone})<br>
+        ${o.address}<br><br>
 
-        ${o.cart.map(i=>"- "+i.name+" ₹"+i.price).join("<br>")}
+        <b>Items:</b><br>
+        ${items}<br>
 
-        <br><br>
-        <button onclick="update('${doc.id}','Accepted')">Accept</button>
-        <button onclick="update('${doc.id}','Rejected')">Reject</button>
-        <button onclick="update('${doc.id}','Delivered')">Delivered</button>
+        <b>Total:</b> ₹${o.total}<br>
+        <b>Status:</b> ${o.status || "Pending"}<br>
+
+        <div class="status">
+          <button class="btn accept" onclick="updateStatus('${doc.id}','Accepted')">Accept</button>
+          <button class="btn reject" onclick="updateStatus('${doc.id}','Rejected')">Reject</button>
+        </div>
       </div>`;
     });
 
-    orders.innerHTML = html;
+    document.getElementById("orders").innerHTML = html;
+
   });
 }
 
-function update(id,status){
-  db.collection("orders").doc(id).update({status:status});
+// UPDATE STATUS
+function updateStatus(id,status){
+  db.collection("orders").doc(id).update({
+    status:status
+  });
 }
 </script></body>
 </html>

@@ -1,40 +1,98 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FINACLE CORE BANKING SYSTEM - PRODUCTION LIVE</title>
-    <style>
-        * { box-sizing: border-box; font-family: monospace; }
-        body { background-color: #1a252f; margin: 10px; color: #000; padding-bottom: 50px; }
-        .system-container { max-width: 750px; margin: 15px auto; background: #eef2f5; border: 4px double #003366; box-shadow: 0px 0px 15px rgba(0,0,0,0.5); }
-        .system-header { background: #004080; color: #ffffff; padding: 10px; font-weight: bold; font-size: 14px; display: flex; justify-content: space-between; }
-        .menu-bar { background-color: #d1dbe5; padding: 6px 15px; font-size: 12px; font-weight: bold; border-bottom: 1px solid #999; color: #002244; }
-        .form-section { padding: 15px; }
-        .fieldset-box { border: 1px solid #003366; background-color: #fff; padding: 15px; margin-bottom: 15px; }
-        .legend-title { font-weight: bold; color: #003366; background: #eef2f5; padding: 0 8px; }
-        .row { margin-bottom: 12px; display: flex; flex-wrap: wrap; align-items: center; }
-        .row label { width: 200px; font-weight: bold; font-size: 13px; }
-        .row input, .row select { padding: 6px; width: 240px; font-weight: bold; border: 1px solid #777; }
-        .row input:focus, .row select:focus { background-color: #ffffcc !important; outline: 2px solid #004080; }
-        .readonly-input { background-color: #e1e7ed !important; color: #b30000 !important; }
-        .fetch-btn { background-color: #0056b3; color: white; border: 1px solid #004080; padding: 8px 15px; font-size: 13px; cursor: pointer; font-weight: bold; }
-        .fetch-btn:hover { background-color: #003366; }
-        .denomination-table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; }
-        .denomination-table th, .denomination-table td { border: 1px solid #003366; padding: 8px; text-align: center; font-size: 13px; }
-        .denomination-table th { background-color: #004080; color: white; }
-        .denom-input { width: 80px; text-align: center; padding: 6px; font-weight: bold; border: 2px solid #555; }
-        .total-section { margin-top: 15px; text-align: right; font-size: 18px; font-weight: bold; background: #002244; color: #fff; padding: 10px; }
-        .btn-container { padding: 15px; text-align: center; background-color: #d1dbe5; border-top: 1px solid #999; }
-        .btn { color: white; padding: 12px 30px; font-size: 15px; font-weight: bold; cursor: pointer; border: 2px solid; }
-        #success-toast { display: none; background-color: #d4edda; color: #155724; border: 2px solid #c3e6cb; padding: 15px; margin: 15px; font-weight: bold; text-align: center; }
-        #alert-toast { display: none; background-color: #f8d7da; color: #721c24; border: 2px solid #f5c6cb; padding: 15px; margin: 15px; font-weight: bold; text-align: center; }
-        
-        /* नया हिस्ट्री टेबल स्टाइल */
-        .history-table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; font-size: 11px; }
-        .history-table th, .history-table td { border: 1px solid #777; padding: 6px; text-align: left; }
-        .history-table th { background-color: #34495e; color: white; }
-        .badge-cr { background-color: #28a745; color: white; padding: 2px 5px; font-weight: bold; }
+  <title>Naamdev Sweets</title>  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>  <style>
+    body { font-family: Arial; padding:20px; }
+    .item { border:1px solid #ccc; padding:10px; margin:10px; }
+    button { padding:6px 10px; }
+  </style></head><body><h2>🍬 NAAMDEV SWEETS</h2><div id="menu"></div><h3>🛒 Cart</h3>
+<div id="cart"></div>
+<h3>Total: ₹<span id="total">0</span></h3><h3>📋 Details</h3>
+<input id="name" placeholder="Name"><br><br>
+<input id="phone" placeholder="Phone"><br><br>
+<input id="address" placeholder="Address"><br><br><button onclick="payNow()">Pay Now</button>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBMpFfXUhIIRHHNTk8GasBxdPDUwWcP3KI",
+  authDomain: "naamdev-sweets.firebaseapp.com",
+  projectId: "naamdev-sweets",
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+let products = [
+  {name:"Milk Cake", price:350},
+  {name:"Kalakand", price:350},
+  {name:"Mawa Chakki", price:250},
+  {name:"Doodh Peda", price:250},
+  {name:"Barfi", price:250},
+  {name:"Rasgulla", price:180},
+  {name:"Laddu", price:160},
+  {name:"Gulab Jamun", price:140},
+  {name:"Samosa", price:20},
+  {name:"Kachori", price:25},
+  {name:"Mirchi Bada", price:25}
+];
+
+let cart = [];
+let total = 0;
+
+let menuHTML = "";
+products.forEach((p,i)=>{
+  menuHTML += `<div class="item">
+    ${p.name} - ₹${p.price}
+    <button onclick="addToCart(${i})">Add</button>
+  </div>`;
+});
+document.getElementById("menu").innerHTML = menuHTML;
+
+function addToCart(i){
+  cart.push(products[i]);
+  total += products[i].price;
+  updateCart();
+}
+
+function updateCart(){
+  let html="";
+  cart.forEach(i=>{
+    html += i.name + " ₹" + i.price + "<br>";
+  });
+  document.getElementById("cart").innerHTML = html;
+  document.getElementById("total").innerText = total;
+}
+
+function payNow(){
+
+  let options = {
+    key: "rzp_test_T9dipl8p8O50UO",
+    amount: total * 100,
+    currency: "INR",
+    name: "Naamdev Sweets",
+
+    handler: async function (response){
+
+      let order = {
+        name: name.value,
+        phone: phone.value,
+        address: address.value,
+        cart: cart,
+        total: total,
+        paymentId: response.razorpay_payment_id,
+        status: "Pending",
+        time: new Date().toLocaleString()
+      };
+
+      await db.collection("orders").add(order);
+
+      alert("✅ Order Placed!");
+    }
+  };
+
+  new Razorpay(options).open();
+}
+</script></body>
+</html>        .badge-cr { background-color: #28a745; color: white; padding: 2px 5px; font-weight: bold; }
         .badge-dr { background-color: #dc3545; color: white; padding: 2px 5px; font-weight: bold; }
         .no-data { text-align: center !important; color: #777; font-style: italic; padding: 15px !important; }
 

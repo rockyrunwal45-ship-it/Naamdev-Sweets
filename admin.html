@@ -1,10 +1,10 @@
 <!DOCTYPE html><html>
 <head>
   <title>Admin Panel</title>  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>  <style>
-    body { font-family: Arial; padding:20px; }
-    .card { border:1px solid #ccc; padding:10px; margin:10px; }
-    button { margin:5px; }
-  </style></head><body><h2>🔐 Admin Login</h2><div id="login">
+    body { font-family: Arial; padding:20px; background:#f5f5f5; }
+    .card { border:1px solid #ddd; padding:10px; margin:10px; border-radius:8px; background:#fff; }
+    button { margin:5px; padding:5px 10px; }
+  </style></head><body><h2>🔐 Admin Login</h2><div id="loginBox">
   <input id="id" placeholder="ID"><br><br>
   <input id="pass" placeholder="Password" type="password"><br><br>
   <button onclick="login()">Login</button>
@@ -23,7 +23,7 @@ const db = firebase.firestore();
 
 function login(){
   if(id.value=="894926" && pass.value=="Rakesh"){
-    login.style.display="none";
+    loginBox.style.display="none";
     panel.style.display="block";
     loadOrders();
   } else {
@@ -47,14 +47,15 @@ function loadOrders(){
         📞 ${o.phone}<br>
         📍 ${o.address}<br>
         💰 ₹${o.total}<br>
-        🧾 ${o.paymentId}<br>
-        📦 ${o.status}<br>
+        🧾 ${o.paymentId || "N/A"}<br>
+        📦 Status: ${o.status}<br><br>
 
         ${o.cart.map(i=>"- "+i.name+" ₹"+i.price).join("<br>")}
 
         <br><br>
         <button onclick="update('${doc.id}','Accepted')">Accept</button>
         <button onclick="update('${doc.id}','Rejected')">Reject</button>
+        <button onclick="update('${doc.id}','Delivered')">Delivered</button>
       </div>`;
     });
 
@@ -66,135 +67,4 @@ function update(id,status){
   db.collection("orders").doc(id).update({status:status});
 }
 </script></body>
-</html>            if (!state.user) {
-                root.innerHTML = `
-                    <div class="max-w-sm mx-auto mt-20 bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-700">
-                        <h3 class="text-base font-black uppercase tracking-wide mb-4">Namdev Sweets Counter Login</h3>
-                        <form id="login-form" class="space-y-3">
-                            <input type="email" id="email" placeholder="Counter Email" required class="w-full p-2.5 rounded bg-slate-700 border border-slate-600 text-sm outline-none text-white">
-                            <input type="password" id="pass" placeholder="Secret Password" required class="w-full p-2.5 rounded bg-slate-700 border border-slate-600 text-sm outline-none text-white">
-                            <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-2 rounded text-xs uppercase tracking-wider">Unlock Dashboard</button>
-                        </form>
-                    </div>
-                `;
-            } else {
-                root.innerHTML = `
-                    <div class="max-w-xl mx-auto space-y-4">
-                        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                            <div><h2 class="text-lg font-black uppercase">Counter Control Panel</h2><p class="text-xs text-slate-400">Namdev Ice Cream Corner</p></div>
-                            <button id="logout-btn" class="text-xs bg-red-600/20 text-red-400 font-bold px-3 py-1.5 rounded border border-red-500/30">Logout Session</button>
-                        </div>
-
-                        <div class="space-y-3">
-                            <h3 class="text-xs font-black uppercase text-slate-400 tracking-wider">Incoming Live Orders</h3>
-                            ${state.orders.length === 0 ? '<p class="text-xs text-slate-500 py-4 text-center">No active requests right now.</p>' : state.orders.map(order => `
-                                <div class="bg-slate-800 border ${order.paymentStatus === 'PENDING' ? 'border-amber-500/40' : 'border-emerald-500/40'} p-3 rounded-xl space-y-2">
-                                    <div class="flex justify-between items-start">
-                                        <div><h4 class="font-bold text-sm text-slate-100">${order.customerName}</h4><p class="text-xs text-slate-400">${order.customerPhone}</p></div>
-                                        <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded ${order.paymentStatus === 'PENDING' ? 'bg-amber-500/20 text-amber-300' : 'bg-emerald-500/20 text-emerald-300'}">
-                                            ${order.paymentStatus === 'PENDING' ? 'Awaiting Payment' : `TOKEN #${order.tokenNumber}`}
-                                        </span>
-                                    </div>
-                                    <div class="bg-slate-900/50 rounded p-2 text-xs text-slate-300 space-y-0.5">
-                                        ${order.items.map(i => `<div>• ${i.name} <span class="text-indigo-400 font-bold">x${i.quantity}</span></div>`).join('')}
-                                    </div>
-                                    <div class="flex justify-between items-center pt-1">
-                                        <span class="text-sm font-black text-emerald-400">₹${order.totalAmount}</span>
-                                        <div class="flex gap-1.5">
-                                            ${order.paymentStatus === 'PENDING' ? `
-                                                <button class="reject-btn bg-red-900/40 text-red-300 border border-red-700/30 text-xs px-2.5 py-1.5 rounded font-bold" data-id="${order.id}">Reject</button>
-                                                <button class="approve-btn bg-emerald-600 text-white text-xs px-3 py-1.5 rounded font-bold shadow" data-id="${order.id}">Confirm Paid</button>
-                                            ` : `
-                                                <button class="deliver-btn bg-slate-700 text-white text-xs px-3 py-1.5 rounded font-bold" data-id="${order.id}">Deliver & Clear</button>
-                                            `}
-                                        </div>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-
-                        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
-                            <span class="text-xs font-black uppercase text-slate-400 block mb-2">Add New Menu Item</span>
-                            <form id="add-form" class="space-y-2.5">
-                                <input type="text" id="p-name" placeholder="Item Name" required class="w-full p-2 text-xs rounded bg-slate-700 border border-slate-600 outline-none text-white">
-                                <div class="grid grid-cols-2 gap-2">
-                                    <input type="number" id="p-price" placeholder="Price (₹)" required class="w-full p-2 text-xs rounded bg-slate-700 border border-slate-600 outline-none text-white">
-                                    <select id="p-cat" class="w-full p-2 text-xs rounded bg-slate-700 border border-slate-600 text-white outline-none">
-                                        <option value="Ice Cream">Ice Cream</option><option value="Sweets">Sweets</option><option value="Cakes">Cakes</option><option value="Hot Snacks">Hot Snacks</option>
-                                    </select>
-                                </div>
-                                <button type="submit" class="w-full bg-indigo-600 text-white py-2 text-xs font-bold rounded uppercase tracking-wide shadow">Publish to Customer Menu</button>
-                            </form>
-                        </div>
-                    </div>
-                `;
-            }
-            bindEvents();
-        }
-
-        function bindEvents() {
-            const loginFrm = document.getElementById("login-form");
-            if (loginFrm) {
-                loginFrm.onsubmit = async (e) => {
-                    e.preventDefault();
-                    try { await signInWithEmailAndPassword(auth, document.getElementById("email").value, document.getElementById("pass").value); }
-                    catch (err) { alert("Access Denied: Invalid Password Setup."); }
-                };
-            }
-
-            const lOut = document.getElementById("logout-btn");
-            if (lOut) lOut.onclick = () => signOut(auth);
-
-            document.querySelectorAll(".approve-btn").forEach(btn => {
-                btn.onclick = async () => {
-                    const id = btn.getAttribute("data-id");
-                    if (confirm("Confirm payment received?")) {
-                        const tokenNum = state.orders.filter(o => o.paymentStatus === 'SUCCESS').length + 1;
-                        try { await updateDoc(doc(db, "orders", id), { paymentStatus: "SUCCESS", tokenNumber: tokenNum }); } catch (e) { alert(e.message); }
-                    }
-                };
-            });
-
-            document.querySelectorAll(".reject-btn").forEach(btn => {
-                btn.onclick = async () => { const id = btn.getAttribute("data-id"); if (confirm("Delete this request?")) { try { await deleteDoc(doc(db, "orders", id)); } catch(e) { alert(e.message); } } };
-            });
-
-            document.querySelectorAll(".deliver-btn").forEach(btn => {
-                btn.onclick = async () => { const id = btn.getAttribute("data-id"); try { await updateDoc(doc(db, "orders", id), { deliveryStatus: "DELIVERED" }); } catch (e) { alert(e.message); } };
-            });
-
-            const addFrm = document.getElementById("add-form");
-            if (addFrm) {
-                addFrm.onsubmit = async (e) => {
-                    e.preventDefault();
-                    const n = document.getElementById("p-name").value;
-                    const p = parseFloat(document.getElementById("p-price").value);
-                    const c = document.getElementById("p-cat").value;
-                    try {
-                        // FIX: Using standardized addDoc to let Firestore auto-generate consistent IDs
-                        await addDoc(collection(db, "products"), { 
-                            name: n.trim(), 
-                            price: p, 
-                            category: c, 
-                            inStock: true, 
-                            createdAt: new Date().toISOString() 
-                        });
-                        alert("Item Added Live!"); 
-                        document.getElementById("p-name").value = ""; 
-                        document.getElementById("p-price").value = "";
-                    } catch (err) { alert("Error: " + err.message); }
-                };
-            }
-        }
-
-        onSnapshot(collection(db, "orders"), (snapshot) => {
-            state.orders = [];
-            snapshot.forEach(doc => { const data = doc.data(); if (data.deliveryStatus === "PENDING") state.orders.push({ id: doc.id, ...data }); });
-            state.orders.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
-            if (state.user) render();
-        });
-
-        onAuthStateChanged(auth, (usr) => { state.user = usr; render(); });
-    </script>
-</body>
 </html>

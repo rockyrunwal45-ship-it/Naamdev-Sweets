@@ -1,40 +1,72 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Namdev Sweets | Counter Control Panel</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-slate-900 text-white antialiased min-h-screen p-4">
+  <title>Admin Panel</title>  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>  <style>
+    body { font-family: Arial; padding:20px; }
+    .card { border:1px solid #ccc; padding:10px; margin:10px; }
+    button { margin:5px; }
+  </style></head><body><h2>🔐 Admin Login</h2><div id="login">
+  <input id="id" placeholder="ID"><br><br>
+  <input id="pass" placeholder="Password" type="password"><br><br>
+  <button onclick="login()">Login</button>
+</div><div id="panel" style="display:none;">
+  <h2>📦 Orders</h2>
+  <div id="orders"></div>
+</div><script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBMpFfXUhIIRHHNTk8GasBxdPDUwWcP3KI",
+  authDomain: "naamdev-sweets.firebaseapp.com",
+  projectId: "naamdev-sweets",
+};
 
-    <div id="admin-root"></div>
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, doc, onSnapshot, updateDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+function login(){
+  if(id.value=="894926" && pass.value=="Rakesh"){
+    login.style.display="none";
+    panel.style.display="block";
+    loadOrders();
+  } else {
+    alert("Wrong login");
+  }
+}
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCiXRCabiRZK1J0Ots25gCB4qqc2HtugsU",
-            authDomain: "namdev-sweets-4c54f.firebaseapp.com",
-            databaseURL: "https://namdev-sweets-4c54f-default-rtdb.firebaseio.com",
-            projectId: "namdev-sweets-4c54f",
-            storageBucket: "namdev-sweets-4c54f.firebasestorage.app",
-            messagingSenderId: "939670079612",
-            appId: "1:939670079612:web:048c93b8e9b7677eaba1f9",
-            measurementId: "G-96TDVDMZTH"
-        };
+function loadOrders(){
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
+  db.collection("orders").orderBy("time","desc")
+  .onSnapshot(snapshot => {
 
-        let state = { user: null, orders: [] };
+    let html="";
 
-        function render() {
-            const root = document.getElementById("admin-root");
-            if (!state.user) {
+    snapshot.forEach(doc=>{
+      let o = doc.data();
+
+      html += `
+      <div class="card">
+        <b>${o.name}</b><br>
+        📞 ${o.phone}<br>
+        📍 ${o.address}<br>
+        💰 ₹${o.total}<br>
+        🧾 ${o.paymentId}<br>
+        📦 ${o.status}<br>
+
+        ${o.cart.map(i=>"- "+i.name+" ₹"+i.price).join("<br>")}
+
+        <br><br>
+        <button onclick="update('${doc.id}','Accepted')">Accept</button>
+        <button onclick="update('${doc.id}','Rejected')">Reject</button>
+      </div>`;
+    });
+
+    orders.innerHTML = html;
+  });
+}
+
+function update(id,status){
+  db.collection("orders").doc(id).update({status:status});
+}
+</script></body>
+</html>            if (!state.user) {
                 root.innerHTML = `
                     <div class="max-w-sm mx-auto mt-20 bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-700">
                         <h3 class="text-base font-black uppercase tracking-wide mb-4">Namdev Sweets Counter Login</h3>

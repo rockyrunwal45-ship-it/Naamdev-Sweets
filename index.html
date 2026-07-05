@@ -1,18 +1,86 @@
 <!DOCTYPE html><html>
 <head>
   <title>Naamdev Sweets</title>  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>  <style>
-    body { font-family: Arial; padding:20px; background:#f9f9f9; }
-    .item { border:1px solid #ddd; padding:10px; margin:10px; border-radius:8px; background:#fff; }
-    button { padding:8px 12px; border:none; background:#ff6600; color:#fff; border-radius:5px; }
-    input { padding:8px; width:90%; }
-  </style></head><body><h2>🍬 NAAMDEV SWEETS</h2><div id="menu"></div><h3>🛒 Cart</h3>
-<div id="cart"></div>
-<h3>Total: ₹<span id="total">0</span></h3><h3>📋 Details</h3>
-<input id="name" placeholder="Name"><br><br>
-<input id="phone" placeholder="Phone"><br><br>
-<input id="address" placeholder="Address"><br><br><button onclick="payNow()">Pay Now</button>
+    body {
+      font-family: Arial;
+      margin:0;
+      background: linear-gradient(135deg,#ff9a9e,#fad0c4);
+    }
 
-<script>
+    header {
+      background:#ff6600;
+      color:#fff;
+      padding:15px;
+      text-align:center;
+      font-size:22px;
+      font-weight:bold;
+    }
+
+    .container {
+      padding:15px;
+    }
+
+    .grid {
+      display:grid;
+      grid-template-columns: repeat(auto-fit,minmax(150px,1fr));
+      gap:10px;
+    }
+
+    .item {
+      background:#fff;
+      border-radius:10px;
+      padding:10px;
+      text-align:center;
+      box-shadow:0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .item h4 {
+      margin:5px 0;
+    }
+
+    .btn {
+      background:#ff6600;
+      color:#fff;
+      border:none;
+      padding:6px 10px;
+      border-radius:5px;
+      cursor:pointer;
+    }
+
+    .cart-box {
+      background:#fff;
+      margin-top:15px;
+      padding:10px;
+      border-radius:10px;
+      box-shadow:0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    input {
+      width:100%;
+      padding:8px;
+      margin-top:8px;
+      border-radius:5px;
+      border:1px solid #ccc;
+    }
+
+    .pay-btn {
+      width:100%;
+      margin-top:10px;
+      background:#28a745;
+      padding:10px;
+      font-size:16px;
+    }
+  </style></head><body><header>🍬 NAAMDEV SWEETS</header><div class="container"><div class="grid" id="menu"></div><div class="cart-box">
+  <h3>🛒 Cart</h3>
+  <div id="cart"></div>
+  <h3>Total: ₹<span id="total">0</span></h3>
+</div><div class="cart-box">
+  <h3>📋 Details</h3>
+  <input id="name" placeholder="Name">
+  <input id="phone" placeholder="Phone">
+  <input id="address" placeholder="Address"><button class="btn pay-btn" onclick="payNow()">Pay Now</button>
+
+</div></div><script>
 const firebaseConfig = {
   apiKey: "AIzaSyBMpFfXUhIIRHHNTk8GasBxdPDUwWcP3KI",
   authDomain: "naamdev-sweets.firebaseapp.com",
@@ -39,17 +107,19 @@ let products = [
 let cart = [];
 let total = 0;
 
-// Load menu
-let menuHTML = "";
+// Render menu
+let html="";
 products.forEach((p,i)=>{
-  menuHTML += `<div class="item">
-    ${p.name} - ₹${p.price}
-    <button onclick="addToCart(${i})">Add</button>
+  html += `
+  <div class="item">
+    <h4>${p.name}</h4>
+    <p>₹${p.price}</p>
+    <button class="btn" onclick="addToCart(${i})">Add</button>
   </div>`;
 });
-menu.innerHTML = menuHTML;
+menu.innerHTML = html;
 
-// Add item
+// Add to cart
 function addToCart(i){
   cart.push(products[i]);
   total += products[i].price;
@@ -58,25 +128,20 @@ function addToCart(i){
 
 // Update cart
 function updateCart(){
-  let html="";
+  let h="";
   cart.forEach(i=>{
-    html += i.name + " ₹" + i.price + "<br>";
+    h += i.name + " ₹" + i.price + "<br>";
   });
-  cart.innerHTML = html;
+  cart.innerHTML = h;
   total.innerText = total;
 }
 
 // Payment
 function payNow(){
 
-  if(total == 0){
-    alert("Cart empty!");
-    return;
-  }
-
+  if(total==0){ alert("Cart empty"); return; }
   if(!name.value || !phone.value || !address.value){
-    alert("Fill all details!");
-    return;
+    alert("Fill all details"); return;
   }
 
   let options = {
@@ -85,31 +150,25 @@ function payNow(){
     currency: "INR",
     name: "Naamdev Sweets",
 
-    handler: async function (response){
+    handler: async function (res){
 
-      let order = {
-        name: name.value,
-        phone: phone.value,
-        address: address.value,
-        cart: cart,
-        total: total,
-        paymentId: response.razorpay_payment_id,
-        status: "Paid",
-        time: new Date().toLocaleString()
-      };
+      await db.collection("orders").add({
+        name:name.value,
+        phone:phone.value,
+        address:address.value,
+        cart:cart,
+        total:total,
+        paymentId:res.razorpay_payment_id,
+        status:"Paid",
+        time:new Date().toLocaleString()
+      });
 
-      await db.collection("orders").add(order);
-
-      alert("✅ Payment Successful & Order Placed!");
-
-      cart = [];
-      total = 0;
-      updateCart();
+      alert("✅ Order Done!");
+      cart=[]; total=0; updateCart();
     }
   };
 
-  let rzp = new Razorpay(options);
-  rzp.open();
+  new Razorpay(options).open();
 }
 </script></body>
 </html>
